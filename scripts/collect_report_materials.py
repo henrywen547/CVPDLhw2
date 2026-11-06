@@ -46,7 +46,8 @@ def main():
     for relative in ("docs/report_draft.md", "docs/q3_results.csv",
                      "docs/paper_method_review.md", "docs/data_exploration.md",
                      "docs/q4_procedure.md", "docs/experiments.md",
-                     "docs/tent_diagnostic_round.md", "docs/round3_plan.md"):
+                     "docs/tent_diagnostic_round.md", "docs/round3_plan.md",
+                     "docs/round4_unmix_plan.md"):
         shutil.copy2(repo / relative, args.out / Path(relative).name)
     shutil.copy2(args.q4_figure, args.out / "q4_examples.png")
     shutil.copy2(args.q4_metadata, args.out / "q4_examples.json")
@@ -90,6 +91,7 @@ def main():
         "- `experiments.md`: official validation and test run record.",
         "- `tent_diagnostic_round.md`: same-code P0/P1 diagnosis and LR grid.",
         "- `round3_plan.md`: public feedback, bounded multiview experiments, and resource checks.",
+        "- `round4_unmix_plan.md`: UnMix-TNS normalization-only test and negative result.",
         "- `data_exploration.md`: validation diagnostics and permutation results.",
         "- `q4_procedure.md`: exact validation-only selection procedure.",
         "- `q4_examples.png`: ready-to-insert eight-panel Q4 figure.",

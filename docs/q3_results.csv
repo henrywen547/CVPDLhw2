@@ -18,3 +18,4 @@ BN ten-view sequential,1759,2112,0.8328598485,28.7405,18.9,706,"eight views plus
 BN ten-view paired,1763,2112,0.8347537879,28.9299,19.0,1164,"five 128-view forwards; paired BN; probability fusion; selected test candidate",a20d1ea21d305d01ad966cc40e067d48991d326b,runs/round3_bn_view10_pair/val_run_log.json
 BN ten-view paired logits,1751,2112,0.8290719697,28.3617,19.0,1164,"same views; raw-logit fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_pair_logits/val_run_log.json
 BN ten-view all-at-once,1754,2112,0.8304924242,28.5038,19.9,4674,"same views; one pooled-BN forward; probability fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_all/val_run_log.json
+UnMix-TNS normalization-only,1413,2112,0.6690340909,12.3580,3.9,912,"source-statistics-initialized K16 online UnMix BN; no optimizer or multiview",a18327c3f8ea80999775b2c7b5cb81345264b0b9,runs/round4_unmix_single/val_run_log.json
