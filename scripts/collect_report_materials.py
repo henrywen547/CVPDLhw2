@@ -43,7 +43,8 @@ def main():
     image_dir.mkdir(exist_ok=True)
     for relative in ("docs/report_draft.md", "docs/q3_results.csv",
                      "docs/paper_method_review.md", "docs/data_exploration.md",
-                     "docs/q4_procedure.md"):
+                     "docs/q4_procedure.md", "docs/experiments.md",
+                     "docs/tent_diagnostic_round.md"):
         shutil.copy2(repo / relative, args.out / Path(relative).name)
     shutil.copy2(args.q4_figure, args.out / "q4_examples.png")
     shutil.copy2(args.q4_metadata, args.out / "q4_examples.json")
@@ -84,6 +85,8 @@ def main():
         "- `report_draft.md`: editable Q1–Q4 text and source links.",
         "- `paper_method_review.md`: paper code, upstream revisions, and HW2 restrictions.",
         "- `q3_results.csv`: official validation comparison table for charting.",
+        "- `experiments.md`: official validation and test run record.",
+        "- `tent_diagnostic_round.md`: same-code P0/P1 diagnosis and LR grid.",
         "- `data_exploration.md`: validation diagnostics and permutation results.",
         "- `q4_procedure.md`: exact validation-only selection procedure.",
         "- `q4_examples.png`: ready-to-insert eight-panel Q4 figure.",

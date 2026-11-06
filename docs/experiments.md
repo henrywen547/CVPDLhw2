@@ -1,12 +1,12 @@
 # Official validation experiments
 
-All rows use the official `starter/run.py --split val`, the unchanged official `harness.py`, the same supplied checkpoint, seed 0, original stream order, batch size 64, and GTX 1080 Ti (11 GiB). Each command loads the source checkpoint afresh. The harness time begins after model construction and data loader setup; it is not the full process startup time. The grading RTX 3090 and full 12,288-image test resource limits remain unverified.
+All rows use the official `starter/run.py --split val`, the unchanged official `harness.py`, the same supplied checkpoint, seed 0, original stream order, batch size 64, and GTX 1080 Ti (11 GiB). Each command loads the source checkpoint afresh. The harness time begins after model construction and data loader setup; it is not the full process startup time. The full 12,288-image test was timed locally, but resource limits on the grading RTX 3090 remain unverified.
 
 | Method | Git commit used | Validation Top-1 | Correct / 2112 | Harness seconds | Peak VRAM MiB | Setting |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | source | `0b26fb09acd2749098eb20222d0cc947f9e1034b` | .545455 | 1152 | 2.7 | 706 | eval, no update |
 | tent | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .723485 | 1528 | 5.2 | 3470 | BN affine, 1 SGD step/batch, lr .001, momentum .9 |
-| tent, lr .003 (later validation only) | `96d5b578119115f78e9ac2fcbb632d5ad4657fb2` | .724432 | 1530 | 5.1 | 3470 | Same one-step Tent; lr .003, momentum .9; not used for the existing test CSV |
+| tent, lr .003 (current test choice) | `96d5b578119115f78e9ac2fcbb632d5ad4657fb2` | .724432 | 1530 | 5.1 | 3470 | Same one-step Tent; lr .003, momentum .9; selected for current test CSV |
 | tent_come | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .722538 | 1526 | 5.3 | 3470 | Same as Tent; opinion entropy, K=1000 |
 | tent_gate, threshold .4 | `f3edf49af806057b8367bd0a5760b92022961cd8` | .723485 | 1528 | 5.2 | 3470 | Custom P2 rule; 33/33 batches updated, so gate was inactive |
 | tent_gate, threshold .25 | `0197bb0567388a83b2faffb4a57c032fb175fb2e` | .723485 | 1528 | 5.0 | 3370 | Custom P2 rule; 31/33 batches updated, 2 predictions changed, no accuracy gain |
@@ -23,9 +23,9 @@ The P3 `gold_sf` output differs from `bn_batch` on 22 images but has exactly the
 
 The diagnostic rerun confirmed `gold_sf` updated the subspace on **33/33 batches**, with scale-vector norm increasing from .00251 after batch 1 to .62142 after batch 33. Its official prediction CSV exactly matched the timed run. This supports treating the unchanged accuracy as an observed negative result, not an inactive adapter. No per-window true accuracy is available.
 
-## Selected validation version
+## Historical selection before the LR round
 
-The current best official validation Top-1 is plain `tent`, 1528/2112. `tent_gate` at .25 ties it with extra logic, so plain Tent is selected for one official test pass. The 2-image lead over BN-only is small; the choice is based on the recorded validation protocol, not on unseen test labels. The test pass will start afresh from the official source checkpoint. We will not use `source_diag`, validation labels, or any saved validation state in test adaptation.
+Before the bounded LR round, the best official validation Top-1 was plain `tent` at lr .001, 1528/2112. `tent_gate` at .25 tied it with extra logic, so plain Tent was selected for the earlier official test pass. The 2-image lead over BN-only was small. That pass started afresh from the official source checkpoint and used no validation labels or saved validation state in test adaptation. The later lr .003 result and current test artifact are recorded below.
 
 ## Commands and outputs
 
@@ -41,9 +41,9 @@ Run from `CVPDLhw2/starter`:
 ../../.venv/bin/python run.py --method gold_sf --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/gold_sf_r8 --seed 0 --tta-lr 0.01 --tta-momentum 0.9 --gold-rank 8 --gold-alpha 0.1 --gold-confidence-threshold 0.5
 ```
 
-The ignored `runs/<run-name>/val_run_log.json` and `val_pred.csv` files contain the official metrics, exact command arguments, and predictions. `docs/data_exploration.md` contains the source model EDA. The incoming paper plan is at `../CVPDL_2026_HW2_Paper_Implementation_Plan.md`.
+The ignored `runs/<run-name>/val_run_log.json` and `val_pred.csv` files contain the official metrics, exact command arguments, and predictions. `docs/data_exploration.md` contains the source model EDA. The new adjustment plan is at `../CVPDL_2026_HW2_Paper_Implementation_Plan (1).md`.
 
-## Single official test pass
+## Earlier official test pass
 
 With selected Git commit `1e4ee135fef0b29d870f8f608d82be82ad7c437c`, from `CVPDLhw2/starter`:
 
@@ -57,4 +57,14 @@ The Kaggle and COOL uploads are external submission steps. The original Q4 slide
 
 ## Later Tent diagnostic round
 
-The same-code P0/P1 comparison and full commands are in [tent_diagnostic_round.md](tent_diagnostic_round.md). It reproduced 1528/2112 at lr .001 and found 1530/2112 at lr .003. This is a validation-only candidate. The official test CSV, staged `test_pred.csv`, root `submission.csv`, and Q4 figure still correspond to lr .001. No second test pass or Kaggle submission was made in that round.
+The same-code P0/P1 comparison and full commands are in [tent_diagnostic_round.md](tent_diagnostic_round.md). It reproduced 1528/2112 at lr .001 and found 1530/2112 at lr .003. A later separate official test pass selected lr .003, preserving the earlier lr .001 output. The current staged `test_pred.csv`/`test_run_log.json`, root `submission.csv`, and Q4 metadata correspond to lr .003. No Kaggle upload was made.
+
+### Current lr .003 test pass
+
+From `CVPDLhw2/starter`, at Git commit `d244f10ac391523f360c52f4281dd397defceb1d`:
+
+```bash
+../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_003 --seed 0 --tta-lr 0.003 --tta-momentum 0.9
+```
+
+The official test log records 12,288 images, 28.3 seconds, 3470 MiB peak sampled VRAM, and 3294 MiB PyTorch maximum reserved memory on the local GTX 1080 Ti. The CSV has `id,label`, 12,288 unique IDs, labels 0–19, and SHA-256 `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, matching its paired log. It differs from the preserved lr .001 test CSV on 166 predictions. Test accuracy is unavailable, and the RTX 3090 runtime has not been measured locally.

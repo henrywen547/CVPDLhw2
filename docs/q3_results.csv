@@ -1,10 +1,10 @@
-strategy,correct,n,top1,harness_seconds,peak_vram_mib,setting,code_commit,run_log
-Frozen source,1152,2112,0.5454545455,2.7,706,"eval; no adaptation",0b26fb09acd2749098eb20222d0cc947f9e1034b,runs/source_val/val_run_log.json
-Current-batch BN statistics only,1526,2112,0.7225378788,2.6,706,"current batch BN; no parameter update",b013fe81faa444b9065936e224ae89a29a175828,runs/bn_batch/val_run_log.json
-Tent,1528,2112,0.7234848485,5.2,3470,"BN affine SGD; lr 0.001; momentum 0.9; one step per batch",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/tent_lr001/val_run_log.json
-Tent LR 0.0003,1526,2112,0.7225378788,5.1,3470,"same Tent; lr 0.0003; momentum 0.9",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_0003/val_run_log.json
-Tent LR 0.003,1530,2112,0.7244318182,5.1,3470,"same Tent; lr 0.003; momentum 0.9; validation only",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_003/val_run_log.json
-Tent+COME,1526,2112,0.7225378788,5.3,3470,"same as Tent; opinion entropy K 1000",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/come_lr001/val_run_log.json
-Tent gate 0.4,1528,2112,0.7234848485,5.2,3470,"custom predicted-class concentration gate; inactive 33/33 updates",f3edf49af806057b8367bd0a5760b92022961cd8,runs/tent_gate_040/val_run_log.json
-Tent gate 0.25,1528,2112,0.7234848485,5.0,3370,"custom predicted-class concentration gate; 31/33 updates",0197bb0567388a83b2faffb4a57c032fb175fb2e,runs/tent_gate_025_timed/val_run_log.json
-Source-free GOLD-inspired subspace,1526,2112,0.7225378788,2.7,754,"rank 8; alpha 0.1; confidence threshold 0.5; scale SGD lr 0.01",b013fe81faa444b9065936e224ae89a29a175828,runs/gold_sf_r8/val_run_log.json
+strategy,correct,n,top1,gain_over_source_pp,harness_seconds,peak_vram_mib,setting,code_commit,run_log
+Frozen source,1152,2112,0.5454545455,0.0000,2.7,706,"eval; no adaptation",0b26fb09acd2749098eb20222d0cc947f9e1034b,runs/source_val/val_run_log.json
+Current-batch BN statistics only,1526,2112,0.7225378788,17.7083,2.6,706,"current batch BN; no parameter update",b013fe81faa444b9065936e224ae89a29a175828,runs/bn_batch/val_run_log.json
+Tent,1528,2112,0.7234848485,17.8030,5.2,3470,"BN affine SGD; lr 0.001; momentum 0.9; one step per batch",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/tent_lr001/val_run_log.json
+Tent LR 0.0003,1526,2112,0.7225378788,17.7083,5.1,3470,"same Tent; lr 0.0003; momentum 0.9",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_0003/val_run_log.json
+Tent LR 0.003,1530,2112,0.7244318182,17.8977,5.1,3470,"same Tent; lr 0.003; momentum 0.9; selected for current test CSV",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_003/val_run_log.json
+Tent+COME,1526,2112,0.7225378788,17.7083,5.3,3470,"same as Tent; opinion entropy K 1000",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/come_lr001/val_run_log.json
+Tent gate 0.4,1528,2112,0.7234848485,17.8030,5.2,3470,"custom predicted-class concentration gate; inactive 33/33 updates",f3edf49af806057b8367bd0a5760b92022961cd8,runs/tent_gate_040/val_run_log.json
+Tent gate 0.25,1528,2112,0.7234848485,17.8030,5.0,3370,"custom predicted-class concentration gate; 31/33 updates",0197bb0567388a83b2faffb4a57c032fb175fb2e,runs/tent_gate_025_timed/val_run_log.json
+Source-free GOLD-inspired subspace,1526,2112,0.7225378788,17.7083,2.7,754,"rank 8; alpha 0.1; confidence threshold 0.5; scale SGD lr 0.01",b013fe81faa444b9065936e224ae89a29a175828,runs/gold_sf_r8/val_run_log.json

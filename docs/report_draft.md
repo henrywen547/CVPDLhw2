@@ -10,28 +10,28 @@ This is editable report content, not a PDF. Numbers are from the official valida
 
 ## Q2. Submitted method
 
-The existing test artifact uses one-step Tent-style BatchNorm adaptation of the supplied 20-class ResNet-50. For each official batch of 64 normalized 160×160 images, the model uses current-batch BN statistics and makes one SGD update to only the BN affine weights and biases by minimizing the mean softmax entropy. The tested artifact used SGD learning rate 0.001, momentum 0.9; seed 0. The current batch's labels are predicted from logits **before** the optimizer step; the next batch sees the update. The method uses no source data, validation labels, other weights, replay, scheduled reset, image ID, or future batch. The official test was a single pass. Full command, code commit and checksum are in `Readme.md` of the local submission staging directory. If a later candidate replaces this test artifact, update Q2 and Q4 to match it.
+The current test artifact uses one-step Tent-style BatchNorm adaptation of the supplied 20-class ResNet-50. For each official batch of 64 normalized 160×160 images, the model uses current-batch BN statistics and makes one SGD update to only the BN affine weights and biases by minimizing the mean softmax entropy. The current artifact uses SGD learning rate **0.003**, momentum 0.9; seed 0. The current batch's labels are predicted from logits **before** the optimizer step; the next batch sees the update. The method uses no source data, validation labels, other weights, replay, scheduled reset, image ID, or future batch. The new official test was a separate single pass from the source checkpoint. Full command, code commit and checksum are in `Readme.md` of the local submission staging directory.
 
 ## Q3. Strategies and official validation results
 
-| Strategy | Correct / 2112 | Top-1 | GTX 1080 Ti harness seconds | Peak VRAM MiB | Finding |
-| --- | ---: | ---: | ---: | ---: | --- |
-| Frozen source | 1152 | .545455 | 2.7 | 706 | Baseline |
-| Current-batch BN statistics only | 1526 | .722538 | 2.6 | 706 | Large gain without trainable update |
-| Tent, one BN-affine update, lr .001 | 1528 | .723485 | 5.2 | 3470 | Used for the existing test artifact |
-| Tent, lr .003, validation only | **1530** | **.724432** | 5.1 | 3470 | New validation-only candidate; no test run yet |
-| Tent + COME opinion entropy | 1526 | .722538 | 5.3 | 3470 | Two fewer correct than Tent at matched optimizer settings |
-| Tent + custom concentration gate, .4 | 1528 | .723485 | 5.2 | 3470 | Gate inactive: 33/33 batches updated |
-| Tent + custom concentration gate, .25 | 1528 | .723485 | 5.0 | 3370 | Skipped 2/33 updates; no accuracy gain |
-| Source-free GOLD-inspired subspace | 1526 | .722538 | 2.7 | 754 | Rank-8 online subspace and scale updated; no accuracy gain |
+| Strategy | Correct / 2112 | Top-1 | Gain vs. source (pp) | GTX 1080 Ti harness seconds | Peak VRAM MiB | Finding |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Frozen source | 1152 | .545455 | 0 | 2.7 | 706 | Baseline |
+| Current-batch BN statistics only | 1526 | .722538 | +17.7083 | 2.6 | 706 | Large gain without trainable update |
+| Tent, one BN-affine update, lr .001 | 1528 | .723485 | +17.8030 | 5.2 | 3470 | Prior test artifact retained |
+| Tent, lr .003 | **1530** | **.724432** | **+17.8977** | 5.1 | 3470 | Current test artifact |
+| Tent + COME opinion entropy | 1526 | .722538 | +17.7083 | 5.3 | 3470 | Two fewer correct than Tent at matched optimizer settings |
+| Tent + custom concentration gate, .4 | 1528 | .723485 | +17.8030 | 5.2 | 3470 | Gate inactive: 33/33 batches updated |
+| Tent + custom concentration gate, .25 | 1528 | .723485 | +17.8030 | 5.0 | 3370 | Skipped 2/33 updates; no accuracy gain |
+| Source-free GOLD-inspired subspace | 1526 | .722538 | +17.7083 | 2.7 | 754 | Rank-8 online subspace and scale updated; no accuracy gain |
 
-The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. Timings and memory above are local GTX 1080 Ti results; they do not certify the RTX 3090 rerun. The single official test pass produced the required CSV in 28.2 seconds and 3470 MiB on this local GPU, without test accuracy access.
+The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. Timings and memory above are local GTX 1080 Ti results; they do not certify the RTX 3090 rerun. The current lr .003 official test pass produced the required CSV in 28.3 seconds and 3470 MiB on this local GPU, without test accuracy access.
 
-The subsequent same-code LR round found .003 improved overall validation by two images over .001, while changing only two predicted labels. This narrow gain should be reported as a validation result, not as evidence of a private-test improvement. The existing test CSV and Q4 figure still correspond to lr .001.
+The subsequent same-code LR round found .003 improved overall validation by two images over .001, while changing only two predicted labels. This narrow gain should be reported as a validation result, not as evidence of a private-test improvement. The current official test CSV and Q4 metadata correspond to lr .003; the visual eight-panel figure happened to select the same eight examples as before.
 
 ## Q4. Eight validation examples
 
-The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official Tent validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. None of that information entered the adaptation method, validation model selection, or test pass. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
+The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official Tent lr .003 validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. The Q4 image labels did not enter the adaptation method or test pass; method selection used only the official aggregate validation scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
 
 | Result | Stream position | Predicted class | Ground-truth class |
 | --- | ---: | --- | --- |
@@ -44,4 +44,4 @@ The original slide wording provided by the user explicitly requires eight valida
 | Incorrect | 1321 | 13 container ship | 14 steam locomotive |
 | Incorrect | 1848 | 8 school bus | 17 laptop |
 
-The local eight-panel figure is `runs/q4_tent/q4_examples.png` (SHA-256 `92af36734b91e742147547a66f8d9cea4efd6815bb53f77f3057c763dafcefc3`). A report-only aggregate cross-check reproduced the official 1528/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.
+The local eight-panel figure is `runs/q4_tent_003/q4_examples.png` (SHA-256 `92af36734b91e742147547a66f8d9cea4efd6815bb53f77f3057c763dafcefc3`). A report-only aggregate cross-check reproduced the official 1530/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.

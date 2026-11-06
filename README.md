@@ -55,41 +55,41 @@ cd starter
 `gold_sf` is a source-free **GOLD-inspired subspace ablation**, not the full author method. It uses only the supplied classifier weights and the current batch's predictions to maintain a rank-8 classifier-sensitive subspace. It trains an 8-value scaling vector with entropy minimization while freezing the backbone. Its eigenbasis is refreshed from current-batch information without a batch-index schedule. See the compliance review for omitted GOLD components.
 
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
-The new same-code Tent diagnostic and bounded learning-rate round is specified in [docs/tent_diagnostic_round.md](docs/tent_diagnostic_round.md). It uses only the official validation stream and leaves the existing test submission unchanged.
+The same-code Tent diagnostic and bounded learning-rate round is recorded in [docs/tent_diagnostic_round.md](docs/tent_diagnostic_round.md). It selected lr .003 by official validation Top-1.
 
-## Selected official test pass
+## Official test artifacts and current submission
 
-The current **existing test artifact** was made with `tent` at SGD lr .001 and momentum .9. It scored 1528/2112 on official validation; this does not reveal its test accuracy. A later bounded validation-only round found lr .003 scored 1530/2112, but has not been used for a new test run or `submission.csv`. From `CVPDLhw2/starter`, with `CVPDL_DIAG_JSONL` unset, the exact command for the existing test artifact was:
+The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
 
 ```bash
 ../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
 ```
 
-The official harness writes `../runs/final_tent_001/test_pred.csv` and `test_run_log.json`. Use the CSV from that same run for Kaggle and retain the matching JSON log for the COOL package.
+The official harness wrote matching `test_pred.csv` and `test_run_log.json` there. This earlier run completed 12,288 test images in 28.2 seconds with 3470 MiB peak VRAM on the GTX 1080 Ti; test accuracy is unavailable.
 
-To generate the Kaggle upload filename from that official run, without rerunning the test stream, run from the repository root:
-
-```bash
-../.venv/bin/python scripts/make_submission.py
-```
-
-The script verifies the paired run-log hash, `id,label` header, 12,288 unique IDs, and label range, then copies the exact CSV bytes to `submission.csv`. Use `--pred`, `--run-log`, and `--out` to select other official run outputs or destination paths.
-
-The single local test pass completed on the GTX 1080 Ti in 28.2 seconds with 3470 MiB sampled peak VRAM. The CSV contains 12,288 unique IDs and valid 0–19 labels; its SHA-256 matches the matching run log. No test accuracy is available. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
-
-The bounded second validation round selected Tent at lr .003 (1530/2112) for a **separate** official test pass from the original checkpoint. Keep the earlier lr .001 run intact. The command for the new pass, from `CVPDLhw2/starter`, is:
+The bounded second validation round selected **Tent lr .003**, 1530/2112 on validation, for a separate official test pass from the original checkpoint. Its exact command was:
 
 ```bash
 ../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_003 --seed 0 --tta-lr 0.003 --tta-momentum 0.9
 ```
 
+This current test run completed 12,288 images in 28.3 seconds with 3470 MiB peak VRAM on the GTX 1080 Ti. Its official CSV SHA-256 is `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, equal to its paired run log. No test accuracy is available. The root `submission.csv` and staged COOL `test_pred.csv`/`test_run_log.json` now match this lr .003 run. The earlier lr .001 outputs remain intact; 166 test predictions differ between runs.
+
+To regenerate the Kaggle upload filename from the current lr .003 official run, without rerunning the test stream, run from the repository root:
+
+```bash
+../.venv/bin/python scripts/make_submission.py
+```
+
+The script verifies the paired run-log hash, `id,label` header, 12,288 unique IDs, and label range, then copies the exact CSV bytes to `submission.csv`. Use `--pred`, `--run-log`, and `--out` to select another official run or destination. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
+
 The Q4 report-only validation-image procedure is documented in [docs/q4_procedure.md](docs/q4_procedure.md). It is separate from the official adaptation and test code. Report source files and the Q4 figure are collected under `runs/report_materials/`; the PDF is left for the user to compose.
 The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_tent/q4_examples.png --q4-metadata runs/q4_tent/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_tent_003/q4_examples.png --q4-metadata runs/q4_tent_003/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules
 
-Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.
+Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection; Q4 report preparation follows the narrow post-evaluation procedure above. Never modify the harness or view test labels.
