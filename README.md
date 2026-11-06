@@ -61,13 +61,13 @@ After the user reported a 0.72005 public score for Tent lr .003, [docs/round3_pl
 
 The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. Its separate full local test took 108.5 seconds and 706 MiB; that output is preserved but is not the current submission.
 
-The ten-view paired candidate reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The user reported public **0.76627** for it. The eight-view method had lower validation accuracy, **1722/2112 (.815341)**, but the user reported a slightly higher public **0.76822**. It is the current submission candidate below.
+The ten-view paired candidate reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The user reported public **0.76627** for it. The eight-view method had lower validation accuracy, **1722/2112 (.815341)**, but the user reported a slightly higher public **0.76822**. Both are preserved as earlier candidates.
 
 [Round 4](docs/round4_unmix_plan.md) tested an independent normalization-only implementation of the UnMix-TNS paper's online BN statistics. It scored **1413/2112 (.669034)**, below BN-only, so it was not used for the current submission.
 
-The [LAME-inspired round](docs/round4_lame_plan.md) tested parameter-free current-batch output correction on one-view BN and six-view BN. `lame_view6` reached **1772/2112 (.839015)** in 11.7 seconds and 808 MiB on official validation. It is a new candidate for a separate full test pass; the current eight-view submission is preserved until its public score is known.
+The [LAME-inspired round](docs/round4_lame_plan.md) tested parameter-free current-batch output correction on one-view BN and six-view BN. `lame_view6` reached **1772/2112 (.839015)** in 11.7 seconds and 808 MiB on official validation.
 
-That separate candidate's official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); reproduction files are in `runs/lame_view6_candidate/`. The new public score is pending. The root `submission.csv` still corresponds to eight-view BN, whose observed public score is 0.76822.
+Its official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. The user reported **public 0.81266**. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); the root `submission.csv` and `runs/submission_staging/` now correspond to this method.
 
 ## Official test artifacts and current submission
 
@@ -95,15 +95,23 @@ The earlier ten-view paired artifact was run from `CVPDLhw2/starter` at commit `
 
 This official local test completed 12,288 images in **109.3 seconds** with **1164 MiB** peak VRAM on the GTX 1080 Ti. Its paired CSV/log hash is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`. The local time exceeds 90 seconds; the grading limit is measured on RTX 3090, which is not available here, so time compliance is **unverified**. The user reported public **0.76627** for this artifact. Its CSV/log remain preserved.
 
-The current `bn_view8` artifact was run from `CVPDLhw2/starter` at commit `57c209a056ecbba04d3d0cf000194d8fd196635d`:
+The earlier `bn_view8` artifact was run from `CVPDLhw2/starter` at commit `57c209a056ecbba04d3d0cf000194d8fd196635d`:
 
 ```bash
 ../../.venv/bin/python run.py --method bn_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view8 --seed 0
 ```
 
-It scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files are in `runs/final_bn_view8/`; the CSV SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The user reported public **0.76822**. The root `submission.csv` and staged COOL test pair now correspond to this eight-view method. Grading RTX 3090 runtime and private accuracy remain unknown.
+It scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files are in `runs/final_bn_view8/`; the CSV SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The user reported public **0.76822**. These earlier files remain preserved.
 
-To regenerate the Kaggle upload filename from the current `bn_view8` official run, without rerunning the test stream, run from the repository root:
+The current `lame_view6` artifact was run from `CVPDLhw2/starter` at commit `c6d18e32b6206abb2a021797e64dc013b3579dcc`:
+
+```bash
+../../.venv/bin/python run.py --method lame_view6 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view6 --seed 0
+```
+
+It scored **1772/2112 (.839015)** on validation and **public 0.81266** as reported by the user. The full local test took **66.2 seconds** and **808 MiB** peak VRAM. Its paired official CSV/log hash is `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`. RTX 3090 runtime and private accuracy remain unmeasured.
+
+To regenerate the Kaggle upload filename from the current `lame_view6` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -115,7 +123,7 @@ The Q4 report-only validation-image procedure is documented in [docs/q4_procedur
 The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_bn_view8/q4_examples.png --q4-metadata runs/q4_bn_view8/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame_view6/q4_examples.png --q4-metadata runs/q4_lame_view6/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules

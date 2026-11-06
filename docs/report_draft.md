@@ -10,7 +10,7 @@ This is editable report content, not a PDF. Numbers are from the official valida
 
 ## Q2. Submitted method
 
-The current test artifact uses the supplied 20-class ResNet-50 with current-view BatchNorm statistics and an eight-view prediction ensemble (`bn_view8`). For each official batch of 64 normalized 160×160 images, four center-crop scales (100%, 90%, 80%, 70%) are resized to 160×160, each with an original and horizontal-flip view. The eight views are inferred sequentially; their softmax probability vectors are summed and the highest-scoring class is returned. The model uses **no optimizer update** and no future batch, image ID, labels, extra weights, source images, or replay. The earlier Tent lr .003 artifact scored public 0.72005. The ten-view paired version reached 0.834754 validation but public 0.76627; this eight-view version reached 0.815341 validation and public **0.76822**, as reported by the user. Its full local GTX 1080 Ti test took 87.3 seconds and 706 MiB; RTX 3090 runtime remains unverified. Full command, code commit, and checksum are in the staged `Readme.md`.
+The current test artifact uses the supplied 20-class ResNet-50 with current-view BatchNorm statistics and six-view prediction (`lame_view6`). For each official batch of 64 normalized 160×160 images, the original and horizontal flip at 100%, 90%, and 80% center crops are inferred sequentially. Softmax probabilities and average-pool features are averaged across views. A symmetric cosine five-neighbor graph is formed within the current batch; ten fixed LAME-inspired output-assignment updates refine the averaged probabilities before argmax. This is an independent local variant, not the complete author implementation. The model uses **no optimizer update** and no future batch, image ID, labels, extra weights, source images, or replay. It reached **1772/2112 (.839015)** official validation and **public 0.81266**, as reported by the user. The earlier eight-view BN artifact reached public 0.76822. The full local GTX 1080 Ti test took **66.2 seconds** and **808 MiB**; RTX 3090 runtime remains unverified. Full command, code commit, and checksum are in the staged `Readme.md`.
 
 ## Q3. Strategies and official validation results
 
@@ -27,29 +27,29 @@ The current test artifact uses the supplied 20-class ResNet-50 with current-view
 | BN original and horizontal flip | 1562 | .739583 | +19.4129 | 4.4 | 706 | Two-view inference |
 | BN four-view | 1617 | .765625 | +22.0170 | 8.0 | 706 | Adds 90% center zoom and flip |
 | BN six-view | 1682 | .796402 | +25.0947 | 11.7 | 706 | Adds 80% center zoom and flip |
-| BN eight-view | **1722** | **.815341** | **+26.9886** | 15.3 | 706 | Current public 0.76822; full local test 87.3 s |
+| BN eight-view | 1722 | .815341 | +26.9886 | 15.3 | 706 | Earlier public 0.76822; full local test 87.3 s |
 | BN ten-view sequential | 1759 | .832860 | +28.7405 | 18.9 | 706 | Adds 60% center zoom and flip |
 | BN ten-view paired | 1763 | .834754 | +28.9299 | 19.0 | 1164 | Public 0.76627; full local test 109.3 s |
 | LAME-inspired output correction, one BN view | 1594 | .754735 | +20.9280 | 2.7 | 706 | Graph correction improves on one-view BN |
-| LAME-inspired output correction, six BN views | 1772 | .839015 | +29.3561 | 11.7 | 808 | Separate full test 66.2 s; public pending |
+| LAME-inspired output correction, six BN views | **1772** | **.839015** | **+29.3561** | 11.7 | 808 | Current public 0.81266; full local test 66.2 s |
 
 The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. The eight-view method improved validation by 192 images over Tent lr .003. The deeper ten-view method improved validation by another 41 images, yet scored 0.00195 lower on the observed public subset. This demonstrates the limits of validation-only model selection here; private accuracy remains unknown. Timings and memory above are local GTX 1080 Ti results and do not certify the RTX 3090 rerun. The complete experiment list, including negative results for post-update Tent and alternative ten-view fusion, is in `q3_results.csv`.
 
-The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. The current official test CSV and Q4 metadata correspond to `bn_view8`.
+The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. The current official test CSV and Q4 metadata correspond to `lame_view6`.
 
 ## Q4. Eight validation examples
 
-The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official `bn_view8` validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. The Q4 image labels did not enter the method or test pass; method selection used official aggregate validation and user-reported public scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
+The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official `lame_view6` validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. The Q4 image labels did not enter the method or test pass; method selection used official aggregate validation and user-reported public scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
 
 | Result | Stream position | Predicted class | Ground-truth class |
 | --- | ---: | --- | --- |
 | Correct | 265 | 3 golden retriever | 3 golden retriever |
 | Correct | 793 | 15 acoustic guitar | 15 acoustic guitar |
-| Correct | 1321 | 14 steam locomotive | 14 steam locomotive |
+| Correct | 1320 | 16 grand piano | 16 grand piano |
 | Correct | 1849 | 10 sports car | 10 sports car |
 | Incorrect | 254 | 6 flamingo | 19 strawberry |
-| Incorrect | 791 | 0 Siberian husky | 1 timber wolf |
-| Incorrect | 1323 | 9 fire engine | 14 steam locomotive |
-| Incorrect | 1848 | 18 teapot | 17 laptop |
+| Incorrect | 785 | 7 tree frog | 2 red fox |
+| Incorrect | 1321 | 13 container ship | 14 steam locomotive |
+| Incorrect | 1848 | 8 school bus | 17 laptop |
 
-The local eight-panel figure is `runs/q4_bn_view8/q4_examples.png` (SHA-256 `39954f4681a44e8b87151ad0d803b5640e038a107a5d14bf6218f300dd1054d3`). A report-only aggregate cross-check reproduced the official 1722/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.
+The local eight-panel figure is `runs/q4_lame_view6/q4_examples.png` (SHA-256 `e360b62b085fb199d223a272d0affcc04ec5dce0446f98cb64ff9e8e92414d29`). A report-only aggregate cross-check reproduced the official 1772/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.
