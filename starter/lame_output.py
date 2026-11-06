@@ -75,3 +75,13 @@ class LameCurrentBatch:
 class LameSixView(LameCurrentBatch):
     crop_borders = (8, 16)
     include_flip = True
+
+
+class LameFourView(LameCurrentBatch):
+    crop_borders = (8,)
+    include_flip = True
+
+
+class LameEightView(LameCurrentBatch):
+    crop_borders = (8, 16, 24)
+    include_flip = True

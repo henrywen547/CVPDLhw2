@@ -1,0 +1,5 @@
+# LAME-inspired view-count sensitivity after public 0.81266
+
+The selected `lame_view6` scored 1772/2112 (.839015) on official validation, user-reported public 0.81266, and completed the full local test in 66.2 seconds / 808 MiB. The public score is 0.02734 below the requested 0.84 target. The prior BN comparison showed a validation/public mismatch for deeper crops, so view count merits a bounded check.
+
+Predeclared comparisons from the same supplied checkpoint and seed 0: `lame_view4` uses original and horizontal flip at 100% and 90% center crops; `lame_view8` adds a 70% crop pair to the selected 100%, 90%, 80% six-view set. Both use the same graph and ten output updates. Run each once through the unchanged official validation harness. Compare Top-1 count, local time, VRAM, and prediction differences with `lame_view6`. A full test pass is justified only if a variant improves validation meaningfully and leaves local runtime headroom under 90 seconds. Keep the selected six-view root and staging files until public evidence supports a change.
