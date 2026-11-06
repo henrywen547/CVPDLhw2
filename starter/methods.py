@@ -10,6 +10,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from diagnostics import SourceDiagnostics
 from gold_source_free import GoldSourceFree
@@ -50,6 +51,21 @@ class BatchStatsFlip(BatchStats):
         original = self.model(x).softmax(1)
         flipped = self.model(x.flip(-1)).softmax(1)
         return (original + flipped).argmax(1)
+
+
+class BatchStatsFlipZoom(BatchStats):
+    """Three-view ensemble with a fixed 90% center crop resized to input size."""
+
+    @torch.no_grad()
+    def __call__(self, x):
+        original = self.model(x).softmax(1)
+        flipped = self.model(x.flip(-1)).softmax(1)
+        border = max(1, round(min(x.shape[-2:]) * 0.05))
+        crop = x[:, :, border:-border, border:-border]
+        zoomed = F.interpolate(crop, size=x.shape[-2:], mode="bilinear",
+                               align_corners=False)
+        zoom = self.model(zoomed).softmax(1)
+        return (original + flipped + zoom).argmax(1)
 
 
 class BatchNormEntropy:
@@ -172,5 +188,6 @@ class TentGate(BatchNormEntropy):
 
 
 METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
-           "bn_flip": BatchStatsFlip, "tent": Tent, "tent_post": TentPost,
+           "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
+           "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}

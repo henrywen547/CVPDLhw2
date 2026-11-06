@@ -10,3 +10,7 @@ The previous P0/P1 diagnosis found current-batch BN statistics account for almos
 | `tent_post` | Apply Tent lr .003 on the current served batch before returning its prediction; use a second forward pass after the update. | Test whether the existing pre-update prediction timing hides an immediate benefit. The harness permits using the current batch before returning, and no future batch is accessed. |
 
 These are local ablations, not claims to reproduce MEMO or another paper. Stop variants that fail to improve official validation Top-1. A favorable result can motivate a limited augmentation-based method with the same stream contract. Preserve `submission.csv` and the current staged test pair until a candidate shows a meaningful, reproducible validation gain and passes the full test resource check.
+
+## Predeclared follow-up after the two initial probes
+
+`bn_flip` improved official validation to 1562/2112 (.7395833), 4.4 seconds, 706 MiB. `tent_post` remained at 1530/2112 (.7244318), 7.0 seconds, 3470 MiB. The next single-variable extension adds a third view: a 90% center crop resized back to 160×160 and averaged with the original and horizontal-flip probabilities (`bn_flip_zoom`). It tests whether mild scale variation adds value without optimization or extra weights. If it fails to beat `bn_flip`, stop that augmentation branch. This is still an inference ensemble, not a MEMO reproduction.
