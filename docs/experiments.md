@@ -18,7 +18,13 @@ P2 prediction diagnostics, verified against formal-run CSVs, show source / Tent 
 
 The .25 gate skipped 2/33 updates and changed two predicted labels compared with Tent, but did not change official Top-1. Its prediction diagnostics and timing run produced identical CSVs. The data-driven skip did not improve this validation result, so P3 comparison continues to use plain Tent as the primary adapted baseline.
 
-The P3 `gold_sf` output differs from `bn_batch` on 22 images but has exactly the same overall accuracy. Its inference and memory costs are close to BN-only because the backbone is frozen and only an eight-value scale is trained. This is a **modified source-free component**, not the author's full GOLD result. It offers no validation gain over BN-only or Tent at the initial setting; a diagnostic rerun will confirm subspace and scale updates. The full author's implementation is excluded because it requires source prototypes and source warm-up forbidden by HW2.
+The P3 `gold_sf` output differs from `bn_batch` on 22 images but has exactly the same overall accuracy. Its inference and memory costs are close to BN-only because the backbone is frozen and only an eight-value scale is trained. This is a **modified source-free component**, not the author's full GOLD result. It offers no validation gain over BN-only or Tent at the initial setting. The full author's implementation is excluded because it requires source prototypes and source warm-up forbidden by HW2.
+
+The diagnostic rerun confirmed `gold_sf` updated the subspace on **33/33 batches**, with scale-vector norm increasing from .00251 after batch 1 to .62142 after batch 33. Its official prediction CSV exactly matched the timed run. This supports treating the unchanged accuracy as an observed negative result, not an inactive adapter. No per-window true accuracy is available.
+
+## Selected validation version
+
+The current best official validation Top-1 is plain `tent`, 1528/2112. `tent_gate` at .25 ties it with extra logic, so plain Tent is selected for one official test pass. The 2-image lead over BN-only is small; the choice is based on the recorded validation protocol, not on unseen test labels. The test pass will start afresh from the official source checkpoint. We will not use `source_diag`, validation labels, or any saved validation state in test adaptation.
 
 ## Commands and outputs
 

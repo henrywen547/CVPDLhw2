@@ -56,6 +56,16 @@ cd starter
 
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
 
+## Selected official test pass
+
+The current validation-selected method is `tent` at SGD lr .001 and momentum .9. It scored 1528/2112 on official validation; this does not reveal its test accuracy. From `CVPDLhw2/starter`, with `CVPDL_DIAG_JSONL` unset:
+
+```bash
+../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
+```
+
+The official harness writes `../runs/final_tent_001/test_pred.csv` and `test_run_log.json`. Use the CSV from that same run for Kaggle and retain the matching JSON log for the COOL package.
+
 ## Rules
 
 Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.
