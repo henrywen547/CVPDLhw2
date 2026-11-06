@@ -65,6 +65,8 @@ The ten-view paired candidate reached **1763/2112 (.834754)** on official valida
 
 [Round 4](docs/round4_unmix_plan.md) tested an independent normalization-only implementation of the UnMix-TNS paper's online BN statistics. It scored **1413/2112 (.669034)**, below BN-only, so it was not used for the current submission.
 
+The [LAME-inspired round](docs/round4_lame_plan.md) now tests parameter-free current-batch output correction on one-view BN and six-view BN. These are validation candidates only; the current eight-view submission is preserved.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:

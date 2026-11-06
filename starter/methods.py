@@ -15,6 +15,7 @@ import torch.nn.functional as F
 from diagnostics import SourceDiagnostics
 from gold_source_free import GoldSourceFree
 from unmix_tns import UnMixStream
+from lame_output import LameCurrentBatch, LameSixView
 
 
 class Source:
@@ -275,7 +276,8 @@ class TentGate(BatchNormEntropy):
 
 
 METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
-           "unmix": UnMixStream,
+           "unmix": UnMixStream, "lame_bn": LameCurrentBatch,
+           "lame_view6": LameSixView,
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,
