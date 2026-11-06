@@ -61,6 +61,8 @@ After the user reported a 0.72005 public score for that artifact, [docs/round3_p
 
 The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. A full test resource check is pending; the lr .003 Tent CSV remains the current submission until that check is reviewed.
 
+The selected follow-up candidate is `bn_view10_pair`, which groups each crop with its flip for one BN inference and averages probabilities over ten views. It reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The full test pass and submission update are recorded separately below once complete.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
