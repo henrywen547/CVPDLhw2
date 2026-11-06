@@ -59,6 +59,8 @@ The same-code Tent diagnostic and bounded learning-rate round is recorded in [do
 
 After the user reported a 0.72005 public score for that artifact, [docs/round3_plan.md](docs/round3_plan.md) predeclared two validation probes: `bn_flip` averages original and horizontal-flip probabilities with current-batch BN; `tent_post` predicts the current batch after one Tent update. These remain experimental and do not change the current `submission.csv` unless official validation supports a new selection.
 
+The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. A full test resource check is pending; the lr .003 Tent CSV remains the current submission until that check is reviewed.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
