@@ -103,6 +103,7 @@ class GoldSourceFree:
                 entropy=(-(probability * probability.clamp_min(1e-12).log()).sum(1)).cpu().tolist(),
                 updated=True,
                 basis_updated=basis_updated,
+                scale_norm=float(self.scale.detach().norm().cpu()),
             )
             with self.diag_path.open("a") as file:
                 file.write(json.dumps(record) + "\n")
