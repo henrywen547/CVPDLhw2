@@ -11,3 +11,5 @@ From `CVPDLhw2`:
 ```
 
 Keep the generated figure local and include it in the final report PDF. Do not put `data/` or validation PNGs into the submission ZIP.
+
+`scripts/collect_report_materials.py` gathers the figure, its metadata, the report text, Q3 CSV, and copies of only the eight selected source PNGs into ignored `runs/report_materials/` for the user's own layout work. The individual PNGs are local source material; they are not extra files for the COOL ZIP.
