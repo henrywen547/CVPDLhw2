@@ -31,6 +31,7 @@ cd starter
 CVPDL_DIAG_JSONL=../runs/source_diag/image_summaries.jsonl ../../.venv/bin/python run.py --method source_diag --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/source_diag --seed 0
 cd ..
 ../.venv/bin/python scripts/analyze_diagnostics.py --diagnostics runs/source_diag/image_summaries.jsonl --baseline-pred runs/source_val/val_pred.csv --diagnostic-pred runs/source_diag/val_pred.csv --out runs/source_diag/summary.json
+../.venv/bin/python scripts/permutation_adjacent.py --diagnostics runs/source_diag/image_summaries.jsonl --out runs/source_diag/permutation_adjacent.json --reps 10000 --seed 0
 ```
 
 The analysis verifies that diagnostic predictions exactly match the baseline. The findings and limitations are in [docs/data_exploration.md](docs/data_exploration.md).
