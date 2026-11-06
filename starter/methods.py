@@ -102,6 +102,17 @@ class BatchStatsTenView(BatchStatsMultiView):
     crop_borders = (8, 16, 24, 32)
 
 
+class BatchStatsTenViewChannelsLast(BatchStatsTenView):
+    """Same ten views with channels-last convolution layout for faster inference."""
+
+    def __init__(self, model):
+        super().__init__(model.to(memory_format=torch.channels_last))
+
+    @torch.inference_mode()
+    def __call__(self, x):
+        return super().__call__(x.contiguous(memory_format=torch.channels_last))
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -225,5 +236,6 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,
+           "bn_view10_cl": BatchStatsTenViewChannelsLast,
            "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}
