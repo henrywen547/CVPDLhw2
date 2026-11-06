@@ -69,6 +69,8 @@ The [LAME-inspired round](docs/round4_lame_plan.md) tested parameter-free curren
 
 Its official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. The user reported **public 0.81266**. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); the root `submission.csv` and `runs/submission_staging/` now correspond to this method.
 
+A [bounded view-count check](docs/round5_view_sensitivity.md) found an eight-view LAME-inspired candidate at **1827/2112 (.865057)** validation, compared with 1772/2112 for the current six-view version. Its separate full local test took **87.5 seconds / 848 MiB**. The verified upload file is `runs/final_lame_view8/submission.csv`; public score is pending. The root submission remains the six-view method until public feedback supports changing it.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:

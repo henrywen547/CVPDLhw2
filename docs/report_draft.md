@@ -32,10 +32,12 @@ The current test artifact uses the supplied 20-class ResNet-50 with current-view
 | BN ten-view paired | 1763 | .834754 | +28.9299 | 19.0 | 1164 | Public 0.76627; full local test 109.3 s |
 | LAME-inspired output correction, one BN view | 1594 | .754735 | +20.9280 | 2.7 | 706 | Graph correction improves on one-view BN |
 | LAME-inspired output correction, six BN views | **1772** | **.839015** | **+29.3561** | 11.7 | 808 | Current public 0.81266; full local test 66.2 s |
+| LAME-inspired output correction, four BN views | 1704 | .806818 | +26.1364 | 8.1 | 768 | Bounded view-count check; no test pass |
+| LAME-inspired output correction, eight BN views | 1827 | .865057 | +31.9602 | 15.3 | 848 | Separate full local test 87.5 s; public pending |
 
 The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. The eight-view method improved validation by 192 images over Tent lr .003. The deeper ten-view method improved validation by another 41 images, yet scored 0.00195 lower on the observed public subset. This demonstrates the limits of validation-only model selection here; private accuracy remains unknown. Timings and memory above are local GTX 1080 Ti results and do not certify the RTX 3090 rerun. The complete experiment list, including negative results for post-update Tent and alternative ten-view fusion, is in `q3_results.csv`.
 
-The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. The current official test CSV and Q4 metadata correspond to `lame_view6`.
+The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. A bounded view-count check found a further validation gain from eight LAME-inspired views, but its public score is pending. The current root official test CSV and Q4 metadata correspond to `lame_view6`.
 
 ## Q4. Eight validation examples
 

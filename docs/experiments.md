@@ -96,3 +96,15 @@ From `CVPDLhw2/starter`, at Git commit `c6d18e32b6206abb2a021797e64dc013b3579dcc
 ```
 
 The full GTX 1080 Ti stream took **66.2 seconds** and **808 MiB** sampled peak VRAM. `runs/final_lame_view6/submission.csv` is a verified copy of the official test CSV (12,288 unique IDs, labels 0–19; SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`, matching the paired official log). The user reported **public 0.81266**, an improvement of **0.04444** over the prior eight-view artifact. This is now the root `submission.csv` and staged COOL method. Private accuracy remains unknown.
+
+## Bounded LAME-inspired view-count check
+
+At commit `902672e5812783ea917af4e0a5e3b55d4ac87a68`, the same fixed output graph was evaluated with four and eight views through the official validation harness. Four views scored **1704/2112 (.806818)** in **8.1 seconds / 768 MiB**, below the selected six-view method. Eight views scored **1827/2112 (.865057)** in **15.3 seconds / 848 MiB**, 55 more correct images than six views. The four-view branch was stopped. Details are in [round5_view_sensitivity.md](round5_view_sensitivity.md).
+
+The eight-view method received one official full test pass from `CVPDLhw2/starter`:
+
+```bash
+../../.venv/bin/python run.py --method lame_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8 --seed 0
+```
+
+The 12,288-image local GTX 1080 Ti pass took **87.5 seconds / 848 MiB**. The paired official CSV/log and verified upload copy `runs/final_lame_view8/submission.csv` have SHA-256 `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`. This is an independent candidate; the root `submission.csv` remains the user-tested six-view method. The eight-view public/private scores and grading RTX 3090 runtime are unmeasured.
