@@ -11,5 +11,6 @@ runs/
 *.zip
 test_pred.csv
 test_run_log.json
+submission.csv
 val_pred.csv
 val_run_log.json
