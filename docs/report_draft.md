@@ -30,6 +30,8 @@ The current test artifact uses the supplied 20-class ResNet-50 with current-view
 | BN eight-view | **1722** | **.815341** | **+26.9886** | 15.3 | 706 | Current public 0.76822; full local test 87.3 s |
 | BN ten-view sequential | 1759 | .832860 | +28.7405 | 18.9 | 706 | Adds 60% center zoom and flip |
 | BN ten-view paired | 1763 | .834754 | +28.9299 | 19.0 | 1164 | Public 0.76627; full local test 109.3 s |
+| LAME-inspired output correction, one BN view | 1594 | .754735 | +20.9280 | 2.7 | 706 | Graph correction improves on one-view BN |
+| LAME-inspired output correction, six BN views | 1772 | .839015 | +29.3561 | 11.7 | 808 | Separate full test 66.2 s; public pending |
 
 The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. The eight-view method improved validation by 192 images over Tent lr .003. The deeper ten-view method improved validation by another 41 images, yet scored 0.00195 lower on the observed public subset. This demonstrates the limits of validation-only model selection here; private accuracy remains unknown. Timings and memory above are local GTX 1080 Ti results and do not certify the RTX 3090 rerun. The complete experiment list, including negative results for post-update Tent and alternative ten-view fusion, is in `q3_results.csv`.
 

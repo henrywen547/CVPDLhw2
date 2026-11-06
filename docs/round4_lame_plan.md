@@ -18,3 +18,7 @@ Both methods ran at code commit `06a95fc04d8de1d80a50183438c663773a058d65`, seed
 | `lame_view6` | **1772** | **.839015** | **11.7** | **808** | 142/2112 |
 
 The six-view graph method is 50 correct images above the current eight-view validation result and has a similar short-stream cost to six-view inference. This supports a separate official full test pass for `lame_view6` to measure the 12,288-image cost and generate a paired CSV/log. It does **not** establish public or private accuracy. The current eight-view root submission stays in place until the user's public feedback on this new candidate.
+
+## Full-stream candidate artifact
+
+The official test pass at Git commit `c6d18e32b6206abb2a021797e64dc013b3579dcc` completed 12,288 images in **66.2 seconds**, with **808 MiB** sampled peak VRAM and **642 MiB** maximum PyTorch reserved memory on the local GTX 1080 Ti. The paired official output is `runs/final_lame_view6/test_pred.csv` plus `test_run_log.json`. The separately generated Kaggle filename is `runs/final_lame_view6/submission.csv`; both CSVs have SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`, matching the log. A reproduction staging folder is `runs/lame_view6_candidate/`. The Q4 report-only figure is `runs/q4_lame_view6/q4_examples.png` (SHA-256 `e360b62b085fb199d223a272d0affcc04ec5dce0446f98cb64ff9e8e92414d29`). The root `submission.csv` remains the previously uploaded eight-view method. No test labels were accessed and the new public score is pending.

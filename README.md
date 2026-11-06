@@ -67,6 +67,8 @@ The ten-view paired candidate reached **1763/2112 (.834754)** on official valida
 
 The [LAME-inspired round](docs/round4_lame_plan.md) tested parameter-free current-batch output correction on one-view BN and six-view BN. `lame_view6` reached **1772/2112 (.839015)** in 11.7 seconds and 808 MiB on official validation. It is a new candidate for a separate full test pass; the current eight-view submission is preserved until its public score is known.
 
+That separate candidate's official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); reproduction files are in `runs/lame_view6_candidate/`. The new public score is pending. The root `submission.csv` still corresponds to eight-view BN, whose observed public score is 0.76822.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
