@@ -8,3 +8,13 @@ Tent+COME,1526,2112,0.7225378788,17.7083,5.3,3470,"same as Tent; opinion entropy
 Tent gate 0.4,1528,2112,0.7234848485,17.8030,5.2,3470,"custom predicted-class concentration gate; inactive 33/33 updates",f3edf49af806057b8367bd0a5760b92022961cd8,runs/tent_gate_040/val_run_log.json
 Tent gate 0.25,1528,2112,0.7234848485,17.8030,5.0,3370,"custom predicted-class concentration gate; 31/33 updates",0197bb0567388a83b2faffb4a57c032fb175fb2e,runs/tent_gate_025_timed/val_run_log.json
 Source-free GOLD-inspired subspace,1526,2112,0.7225378788,17.7083,2.7,754,"rank 8; alpha 0.1; confidence threshold 0.5; scale SGD lr 0.01",b013fe81faa444b9065936e224ae89a29a175828,runs/gold_sf_r8/val_run_log.json
+BN original+flip,1562,2112,0.7395833333,19.4129,4.4,706,"two views; current-view BN; equal probability average",8deed67b0e12bdce42941ffb057f8e1a32fa2a50,runs/round3_bn_flip/val_run_log.json
+Tent current-batch post-update,1530,2112,0.7244318182,17.8977,7.0,3470,"Tent lr 0.003; predict current batch after update",8deed67b0e12bdce42941ffb057f8e1a32fa2a50,runs/round3_tent_post_003/val_run_log.json
+BN three-view,1604,2112,0.7594696970,21.4015,6.2,706,"original; flip; 90 percent center zoom",ad5c208561ca3e6988d8412215b19e13026d2947,runs/round3_bn_flip_zoom/val_run_log.json
+BN four-view,1617,2112,0.7656250000,22.0170,8.0,706,"original+flip; 90 percent center zoom+flip",252388e6ecea23c14b73dbb94edbc89add67a7c1,runs/round3_bn_view4/val_run_log.json
+BN six-view,1682,2112,0.7964015152,25.0947,11.7,706,"four views plus 80 percent center zoom+flip",252388e6ecea23c14b73dbb94edbc89add67a7c1,runs/round3_bn_view6/val_run_log.json
+BN eight-view,1722,2112,0.8153409091,26.9886,15.3,706,"six views plus 70 percent center zoom+flip",dc3ce7ccaa5fb0215baf710cade7e9d619f822da,runs/round3_bn_view8/val_run_log.json
+BN ten-view sequential,1759,2112,0.8328598485,28.7405,18.9,706,"eight views plus 60 percent center zoom+flip",dc3ce7ccaa5fb0215baf710cade7e9d619f822da,runs/round3_bn_view10/val_run_log.json
+BN ten-view paired,1763,2112,0.8347537879,28.9299,19.0,1164,"five 128-view forwards; paired BN; probability fusion; selected test candidate",a20d1ea21d305d01ad966cc40e067d48991d326b,runs/round3_bn_view10_pair/val_run_log.json
+BN ten-view paired logits,1751,2112,0.8290719697,28.3617,19.0,1164,"same views; raw-logit fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_pair_logits/val_run_log.json
+BN ten-view all-at-once,1754,2112,0.8304924242,28.5038,19.9,4674,"same views; one pooled-BN forward; probability fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_all/val_run_log.json

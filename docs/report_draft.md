@@ -10,7 +10,7 @@ This is editable report content, not a PDF. Numbers are from the official valida
 
 ## Q2. Submitted method
 
-The current test artifact uses one-step Tent-style BatchNorm adaptation of the supplied 20-class ResNet-50. For each official batch of 64 normalized 160×160 images, the model uses current-batch BN statistics and makes one SGD update to only the BN affine weights and biases by minimizing the mean softmax entropy. The current artifact uses SGD learning rate **0.003**, momentum 0.9; seed 0. The current batch's labels are predicted from logits **before** the optimizer step; the next batch sees the update. The method uses no source data, validation labels, other weights, replay, scheduled reset, image ID, or future batch. The new official test was a separate single pass from the source checkpoint. Full command, code commit and checksum are in `Readme.md` of the local submission staging directory.
+The current test artifact uses the supplied 20-class ResNet-50 with current-batch BatchNorm statistics and a ten-view prediction ensemble (`bn_view10_pair`). For each official batch of 64 normalized 160×160 images, five center-crop scales (100%, 90%, 80%, 70%, 60%) are resized to 160×160, each with an original and horizontal-flip view. Each scale's two views are concatenated into one 128-image inference batch; the ten softmax probability vectors are summed and the highest-scoring class is returned. The model uses **no optimizer update** and no future batch, image ID, labels, extra weights, source images, or replay. The earlier Tent lr .003 artifact scored 0.72005 on the public leaderboard as reported by the user. This multiview method was selected by official validation Top-1; its public result is not yet known. The local GTX 1080 Ti test took 109.3 seconds, above the 90-second grading limit; RTX 3090 runtime remains unverified. Full command, code commit, and checksum are in the staged `Readme.md`.
 
 ## Q3. Strategies and official validation results
 
@@ -19,29 +19,35 @@ The current test artifact uses one-step Tent-style BatchNorm adaptation of the s
 | Frozen source | 1152 | .545455 | 0 | 2.7 | 706 | Baseline |
 | Current-batch BN statistics only | 1526 | .722538 | +17.7083 | 2.6 | 706 | Large gain without trainable update |
 | Tent, one BN-affine update, lr .001 | 1528 | .723485 | +17.8030 | 5.2 | 3470 | Prior test artifact retained |
-| Tent, lr .003 | **1530** | **.724432** | **+17.8977** | 5.1 | 3470 | Current test artifact |
+| Tent, lr .003 | 1530 | .724432 | +17.8977 | 5.1 | 3470 | Earlier public 0.72005, reported by user |
 | Tent + COME opinion entropy | 1526 | .722538 | +17.7083 | 5.3 | 3470 | Two fewer correct than Tent at matched optimizer settings |
 | Tent + custom concentration gate, .4 | 1528 | .723485 | +17.8030 | 5.2 | 3470 | Gate inactive: 33/33 batches updated |
 | Tent + custom concentration gate, .25 | 1528 | .723485 | +17.8030 | 5.0 | 3370 | Skipped 2/33 updates; no accuracy gain |
 | Source-free GOLD-inspired subspace | 1526 | .722538 | +17.7083 | 2.7 | 754 | Rank-8 online subspace and scale updated; no accuracy gain |
+| BN original and horizontal flip | 1562 | .739583 | +19.4129 | 4.4 | 706 | Two-view inference |
+| BN four-view | 1617 | .765625 | +22.0170 | 8.0 | 706 | Adds 90% center zoom and flip |
+| BN six-view | 1682 | .796402 | +25.0947 | 11.7 | 706 | Adds 80% center zoom and flip |
+| BN eight-view | 1722 | .815341 | +26.9886 | 15.3 | 706 | Adds 70% center zoom and flip |
+| BN ten-view sequential | 1759 | .832860 | +28.7405 | 18.9 | 706 | Adds 60% center zoom and flip |
+| BN ten-view paired | **1763** | **.834754** | **+28.9299** | 19.0 | 1164 | Current test candidate; paired BN |
 
-The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. Timings and memory above are local GTX 1080 Ti results; they do not certify the RTX 3090 rerun. The current lr .003 official test pass produced the required CSV in 28.3 seconds and 3470 MiB on this local GPU, without test accuracy access.
+The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. The ten-view method improved validation by 233 images over Tent lr .003. Timings and memory above are local GTX 1080 Ti results; they do not certify the RTX 3090 rerun. Its full local test took 109.3 seconds and 1164 MiB, with no test accuracy access. The complete experiment list, including negative results for post-update Tent and alternative ten-view fusion, is in `q3_results.csv`.
 
-The subsequent same-code LR round found .003 improved overall validation by two images over .001, while changing only two predicted labels. This narrow gain should be reported as a validation result, not as evidence of a private-test improvement. The current official test CSV and Q4 metadata correspond to lr .003; the visual eight-panel figure happened to select the same eight examples as before.
+The same-code LR round found .003 improved overall validation by two images over .001. The later multiview result is much larger, but the new public and private scores remain unknown. The current official test CSV and Q4 metadata correspond to `bn_view10_pair`.
 
 ## Q4. Eight validation examples
 
-The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official Tent lr .003 validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. The Q4 image labels did not enter the adaptation method or test pass; method selection used only the official aggregate validation scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
+The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official `bn_view10_pair` validation prediction CSV, then read validation-only labels and eight selected validation images **after** evaluation for report preparation. The Q4 image labels did not enter the method or test pass; method selection used only the official aggregate validation scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
 
 | Result | Stream position | Predicted class | Ground-truth class |
 | --- | ---: | --- | --- |
 | Correct | 265 | 3 golden retriever | 3 golden retriever |
 | Correct | 793 | 15 acoustic guitar | 15 acoustic guitar |
-| Correct | 1320 | 16 grand piano | 16 grand piano |
+| Correct | 1321 | 14 steam locomotive | 14 steam locomotive |
 | Correct | 1849 | 10 sports car | 10 sports car |
-| Incorrect | 254 | 17 laptop | 19 strawberry |
-| Incorrect | 791 | 2 red fox | 1 timber wolf |
-| Incorrect | 1321 | 13 container ship | 14 steam locomotive |
-| Incorrect | 1848 | 8 school bus | 17 laptop |
+| Incorrect | 264 | 11 mountain bike | 5 bald eagle |
+| Incorrect | 791 | 0 Siberian husky | 1 timber wolf |
+| Incorrect | 1323 | 9 fire engine | 14 steam locomotive |
+| Incorrect | 1848 | 18 teapot | 17 laptop |
 
-The local eight-panel figure is `runs/q4_tent_003/q4_examples.png` (SHA-256 `92af36734b91e742147547a66f8d9cea4efd6815bb53f77f3057c763dafcefc3`). A report-only aggregate cross-check reproduced the official 1530/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.
+The local eight-panel figure is `runs/q4_bn_view10_pair/q4_examples.png` (SHA-256 `6ed1dac27ee1fdbbb435267e1315d05cedfc109fa5889ffc56c1f8491752f7d4`). A report-only aggregate cross-check reproduced the official 1763/2112 validation count. The figure should be embedded in the report PDF, not submitted as separate validation images.

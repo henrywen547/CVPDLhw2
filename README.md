@@ -57,11 +57,11 @@ cd starter
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
 The same-code Tent diagnostic and bounded learning-rate round is recorded in [docs/tent_diagnostic_round.md](docs/tent_diagnostic_round.md). It selected lr .003 by official validation Top-1.
 
-After the user reported a 0.72005 public score for that artifact, [docs/round3_plan.md](docs/round3_plan.md) predeclared two validation probes: `bn_flip` averages original and horizontal-flip probabilities with current-batch BN; `tent_post` predicts the current batch after one Tent update. These remain experimental and do not change the current `submission.csv` unless official validation supports a new selection.
+After the user reported a 0.72005 public score for Tent lr .003, [docs/round3_plan.md](docs/round3_plan.md) recorded a bounded multiview validation round. `bn_flip` averages original and horizontal-flip probabilities with current-batch BN; `tent_post` predicts the current batch after one Tent update. The complete results are in [docs/q3_results.csv](docs/q3_results.csv).
 
-The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. A full test resource check is pending; the lr .003 Tent CSV remains the current submission until that check is reviewed.
+The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. Its separate full local test took 108.5 seconds and 706 MiB; that output is preserved but is not the current submission.
 
-The selected follow-up candidate is `bn_view10_pair`, which groups each crop with its flip for one BN inference and averages probabilities over ten views. It reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The full test pass and submission update are recorded separately below once complete.
+The selected follow-up candidate is `bn_view10_pair`, which groups each crop with its flip for one BN inference and averages probabilities over ten views. It reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. Its official full test pass is the current submission candidate below.
 
 ## Official test artifacts and current submission
 
@@ -79,9 +79,17 @@ The bounded second validation round selected **Tent lr .003**, 1530/2112 on vali
 ../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_003 --seed 0 --tta-lr 0.003 --tta-momentum 0.9
 ```
 
-This current test run completed 12,288 images in 28.3 seconds with 3470 MiB peak VRAM on the GTX 1080 Ti. Its official CSV SHA-256 is `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, equal to its paired run log. No test accuracy is available. The root `submission.csv` and staged COOL `test_pred.csv`/`test_run_log.json` now match this lr .003 run. The earlier lr .001 outputs remain intact; 166 test predictions differ between runs.
+This earlier test run completed 12,288 images in 28.3 seconds with 3470 MiB peak VRAM on the GTX 1080 Ti. Its official CSV SHA-256 is `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, equal to its paired run log. The user reported a **0.72005 public score** for this artifact. The earlier lr .001 outputs remain intact; 166 test predictions differ between those Tent runs.
 
-To regenerate the Kaggle upload filename from the current lr .003 official run, without rerunning the test stream, run from the repository root:
+The current validation-selected `bn_view10_pair` artifact was run from `CVPDLhw2/starter` at commit `a01bef5ec76176f6f9d8cfc5131e3268d87b5496`:
+
+```bash
+../../.venv/bin/python run.py --method bn_view10_pair --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view10_pair --seed 0
+```
+
+This official local test completed 12,288 images in **109.3 seconds** with **1164 MiB** peak VRAM on the GTX 1080 Ti. Its paired CSV/log hash is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`. The local time exceeds 90 seconds; the grading limit is measured on RTX 3090, which is not available here, so time compliance is **unverified**. No new public score or test accuracy is available. The root `submission.csv` and staged COOL test pair correspond to this method, while both earlier Tent artifacts remain preserved.
+
+To regenerate the Kaggle upload filename from the current `bn_view10_pair` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -93,7 +101,7 @@ The Q4 report-only validation-image procedure is documented in [docs/q4_procedur
 The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_tent_003/q4_examples.png --q4-metadata runs/q4_tent_003/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_bn_view10_pair/q4_examples.png --q4-metadata runs/q4_bn_view10_pair/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules

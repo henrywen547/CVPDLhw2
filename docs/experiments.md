@@ -6,7 +6,7 @@ All rows use the official `starter/run.py --split val`, the unchanged official `
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | source | `0b26fb09acd2749098eb20222d0cc947f9e1034b` | .545455 | 1152 | 2.7 | 706 | eval, no update |
 | tent | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .723485 | 1528 | 5.2 | 3470 | BN affine, 1 SGD step/batch, lr .001, momentum .9 |
-| tent, lr .003 (current test choice) | `96d5b578119115f78e9ac2fcbb632d5ad4657fb2` | .724432 | 1530 | 5.1 | 3470 | Same one-step Tent; lr .003, momentum .9; selected for current test CSV |
+| tent, lr .003 (earlier test choice) | `96d5b578119115f78e9ac2fcbb632d5ad4657fb2` | .724432 | 1530 | 5.1 | 3470 | Same one-step Tent; lr .003, momentum .9; used for earlier public 0.72005 CSV |
 | tent_come | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .722538 | 1526 | 5.3 | 3470 | Same as Tent; opinion entropy, K=1000 |
 | tent_gate, threshold .4 | `f3edf49af806057b8367bd0a5760b92022961cd8` | .723485 | 1528 | 5.2 | 3470 | Custom P2 rule; 33/33 batches updated, so gate was inactive |
 | tent_gate, threshold .25 | `0197bb0567388a83b2faffb4a57c032fb175fb2e` | .723485 | 1528 | 5.0 | 3370 | Custom P2 rule; 31/33 batches updated, 2 predictions changed, no accuracy gain |
@@ -57,7 +57,7 @@ The Kaggle and COOL uploads are external submission steps. The original Q4 slide
 
 ## Later Tent diagnostic round
 
-The same-code P0/P1 comparison and full commands are in [tent_diagnostic_round.md](tent_diagnostic_round.md). It reproduced 1528/2112 at lr .001 and found 1530/2112 at lr .003. A later separate official test pass selected lr .003, preserving the earlier lr .001 output. The current staged `test_pred.csv`/`test_run_log.json`, root `submission.csv`, and Q4 metadata correspond to lr .003. No Kaggle upload was made.
+The same-code P0/P1 comparison and full commands are in [tent_diagnostic_round.md](tent_diagnostic_round.md). It reproduced 1528/2112 at lr .001 and found 1530/2112 at lr .003. A later separate official test pass selected lr .003, preserving the earlier lr .001 output. The user reported that Tent lr .003 scored **0.72005 public**. That is historical feedback; the current staged test pair, root `submission.csv`, and Q4 metadata are updated in the later multiview round below. No new Kaggle upload was made by the agent.
 
 ### Current lr .003 test pass
 
@@ -68,3 +68,15 @@ From `CVPDLhw2/starter`, at Git commit `d244f10ac391523f360c52f4281dd397defceb1d
 ```
 
 The official test log records 12,288 images, 28.3 seconds, 3470 MiB peak sampled VRAM, and 3294 MiB PyTorch maximum reserved memory on the local GTX 1080 Ti. The CSV has `id,label`, 12,288 unique IDs, labels 0–19, and SHA-256 `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, matching its paired log. It differs from the preserved lr .001 test CSV on 166 predictions. Test accuracy is unavailable, and the RTX 3090 runtime has not been measured locally.
+
+## Multiview BN round after public feedback
+
+The bounded method and resource results are in [round3_plan.md](round3_plan.md); all official validation rows, including negative results, are in [q3_results.csv](q3_results.csv). Horizontal-flip and center-crop views gave much larger validation gains than immediate Tent updates. The selected `bn_view10_pair` scored **1763/2112 (.8347538)**, compared with Tent lr .003's 1530/2112 (.7244318). It uses only the current unlabeled batch, ten views across five scales, current-batch BN statistics, and no trainable update. The corresponding Q4 figure uses that method's official validation prediction CSV.
+
+At Git commit `a01bef5ec76176f6f9d8cfc5131e3268d87b5496`, from `CVPDLhw2/starter`, the selected full test command was:
+
+```bash
+../../.venv/bin/python run.py --method bn_view10_pair --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view10_pair --seed 0
+```
+
+The paired official test outputs are `runs/final_bn_view10_pair/test_pred.csv` and `test_run_log.json`. The full local GTX 1080 Ti stream took **109.3 seconds**, with **1164 MiB** sampled peak VRAM; the CSV SHA-256 is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`, matching its log. The local time is above 90 seconds. Whether it passes the grading RTX 3090 limit is not yet measured; no public result for this new artifact is available. The older Tent run and CSV remain intact.
