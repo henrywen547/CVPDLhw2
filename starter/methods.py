@@ -68,6 +68,32 @@ class BatchStatsFlipZoom(BatchStats):
         return (original + flipped + zoom).argmax(1)
 
 
+class BatchStatsMultiView(BatchStats):
+    """Sequential probability ensemble over flips and fixed center zooms."""
+
+    crop_borders = (8,)
+
+    @torch.no_grad()
+    def __call__(self, x):
+        probabilities = self.model(x).softmax(1)
+        probabilities += self.model(x.flip(-1)).softmax(1)
+        for border in self.crop_borders:
+            crop = x[:, :, border:-border, border:-border]
+            zoomed = F.interpolate(crop, size=x.shape[-2:], mode="bilinear",
+                                   align_corners=False)
+            probabilities += self.model(zoomed).softmax(1)
+            probabilities += self.model(zoomed.flip(-1)).softmax(1)
+        return probabilities.argmax(1)
+
+
+class BatchStatsFourView(BatchStatsMultiView):
+    crop_borders = (8,)
+
+
+class BatchStatsSixView(BatchStatsMultiView):
+    crop_borders = (8, 16)
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -189,5 +215,6 @@ class TentGate(BatchNormEntropy):
 
 METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
+           "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}
