@@ -63,6 +63,8 @@ The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which av
 
 The ten-view paired candidate reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The user reported public **0.76627** for it. The eight-view method had lower validation accuracy, **1722/2112 (.815341)**, but the user reported a slightly higher public **0.76822**. It is the current submission candidate below.
 
+[Round 4](docs/round4_unmix_plan.md) tests an independent normalization-only implementation of the UnMix-TNS paper's online BN statistics. It is an experimental validation candidate and is not used by the current submission.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
