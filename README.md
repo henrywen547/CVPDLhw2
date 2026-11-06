@@ -66,6 +66,8 @@ The current validation-selected method is `tent` at SGD lr .001 and momentum .9.
 
 The official harness writes `../runs/final_tent_001/test_pred.csv` and `test_run_log.json`. Use the CSV from that same run for Kaggle and retain the matching JSON log for the COOL package.
 
+The single local test pass completed on the GTX 1080 Ti in 28.2 seconds with 3470 MiB sampled peak VRAM. The CSV contains 12,288 unique IDs and valid 0–19 labels; its SHA-256 matches the matching run log. No test accuracy is available. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
+
 ## Rules
 
 Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.

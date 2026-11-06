@@ -41,3 +41,15 @@ Run from `CVPDLhw2/starter`:
 ```
 
 The ignored `runs/<run-name>/val_run_log.json` and `val_pred.csv` files contain the official metrics, exact command arguments, and predictions. `docs/data_exploration.md` contains the source model EDA. The incoming paper plan is at `../CVPDL_2026_HW2_Paper_Implementation_Plan.md`.
+
+## Single official test pass
+
+With selected Git commit `1e4ee135fef0b29d870f8f608d82be82ad7c437c`, from `CVPDLhw2/starter`:
+
+```bash
+../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
+```
+
+The official harness completed 12,288 images in **28.2 seconds**, with **3470 MiB** peak sampled VRAM and **3294 MiB** maximum PyTorch reserved memory, on the local GTX 1080 Ti. The official output files are `runs/final_tent_001/test_pred.csv` and `runs/final_tent_001/test_run_log.json`. CSV validation found header `id,label`, exactly 12,288 unique IDs, integer labels in 0–19, and SHA-256 `d6ee738231872c47d1c9c744110dd12700a2797cee520569ffe51144d22c06e2`, equal to the log's `pred_sha256`. The test log contains no accuracy. This was one online test pass; no test labels were sought or used. Timing and VRAM still need confirmation on the grading RTX 3090.
+
+The Kaggle submission and COOL report are external submission steps. A complete COOL ZIP still requires `Readme.md`, the report PDF (at most six pages), and the Q4 four-correct/four-incorrect validation examples. The current official harness exposes only overall validation accuracy; the permitted path for matching validation images to true labels needs TA clarification before Q4 can be completed without directly reading `data/`.
