@@ -63,6 +63,16 @@ def main():
                      f"{item['prediction']} {classes[item['prediction']]} | "
                      f"{item['truth']} {classes[item['truth']]} |")
 
+    paper_sources = (
+        ("COME_ICLR2025.pdf", "https://proceedings.iclr.cc/paper_files/paper/2025/file/2ea18fdc667e0ef2ad82b2b4d65147ad-Paper-Conference.pdf"),
+        ("GOLD_CVPR2026.pdf", "https://arxiv.org/pdf/2603.21928"),
+    )
+    papers = []
+    for filename, url in paper_sources:
+        paper = args.out / "papers" / filename
+        if paper.exists():
+            papers.append(f"- [`papers/{filename}`](papers/{filename}) — [original source]({url}); SHA-256 `{sha256(paper)}`.")
+
     readme = "\n".join([
         "# CVPDL HW2 report materials",
         "",
@@ -79,6 +89,11 @@ def main():
         "- `q4_examples.png`: ready-to-insert eight-panel Q4 figure.",
         "- `q4_examples.json`: selected IDs, positions, predicted and true indices.",
         "- `q4_individual_images/`: the same eight original validation PNGs for custom layout.",
+        "- `papers/`: original COME and GOLD PDFs for offline Q1 reading (when downloaded).",
+        "",
+        "## Q1 papers",
+        "",
+        *papers,
         "",
         f"Q4 figure SHA-256: `{sha256(args.q4_figure)}`.",
         f"Official Tent validation prediction CSV SHA-256: `{metadata['prediction_sha256']}`.",
@@ -89,6 +104,7 @@ def main():
         "",
         "Do not include the validation dataset or these eight source PNGs separately in the COOL ZIP;",
         "only place the chosen figure or images inside the final report PDF.",
+        "Do not include the paper PDFs as separate COOL ZIP files.",
         "",
     ])
     (args.out / "README.md").write_text(readme)

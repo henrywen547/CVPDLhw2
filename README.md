@@ -69,6 +69,7 @@ The official harness writes `../runs/final_tent_001/test_pred.csv` and `test_run
 The single local test pass completed on the GTX 1080 Ti in 28.2 seconds with 3470 MiB sampled peak VRAM. The CSV contains 12,288 unique IDs and valid 0–19 labels; its SHA-256 matches the matching run log. No test accuracy is available. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
 
 The Q4 report-only validation-image procedure is documented in [docs/q4_procedure.md](docs/q4_procedure.md). It is separate from the official adaptation and test code. Report source files and the Q4 figure are collected under `runs/report_materials/`; the PDF is left for the user to compose.
+The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
 ```bash
 ../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_tent/q4_examples.png --q4-metadata runs/q4_tent/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
