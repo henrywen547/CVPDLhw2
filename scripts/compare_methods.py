@@ -46,7 +46,7 @@ def main():
         batch = [proxy(labels[i:i + 64]) for i in range(0, len(labels), 64)]
         windows = [dict(start=i + 1, end=min(i + 256, len(labels)), **proxy(labels[i:i + 256]))
                    for i in range(0, len(labels), 256)]
-        result = dict(commit=None, acc=log["acc"], seconds=log["seconds"], peak_vram_mib=log["peak_vram_mib"],
+        result = dict(acc=log["acc"], seconds=log["seconds"], peak_vram_mib=log["peak_vram_mib"],
                       config=log["config"], overall=proxy(labels),
                       mean_batch_max_class_share=mean(item["max_class_share"] for item in batch),
                       max_batch_max_class_share=max(item["max_class_share"] for item in batch),

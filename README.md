@@ -45,6 +45,7 @@ cd starter
 ../../.venv/bin/python run.py --method tent --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
 ../../.venv/bin/python run.py --method tent_come --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/come_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --come-k 1000
 ../../.venv/bin/python run.py --method tent_gate --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_gate_040 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --max-class-share 0.4
+../../.venv/bin/python run.py --method tent_gate --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_gate_025 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --max-class-share 0.25
 ```
 
 `tent_gate` is a custom P2 ablation: it skips the update if the current batch's largest predicted class exceeds 40%. The threshold is fixed before this run and does not use batch index, image ID, or labels. For validation-only confidence diagnostics, set `CVPDL_DIAG_JSONL=../runs/<run-name>/diagnostics.jsonl` before invoking either TTA method; this adds logging overhead and should be left unset for timing or final testing. The comparison script reads only official output and optional diagnostic logs.
