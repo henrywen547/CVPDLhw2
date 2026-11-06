@@ -61,7 +61,7 @@ After the user reported a 0.72005 public score for Tent lr .003, [docs/round3_pl
 
 The bounded follow-up reached **1759/2112 (.832860)** with `bn_view10`, which averages original, horizontal-flip, and four fixed center-crop scales with flips. It uses current-view BN statistics and no optimizer update. Its separate full local test took 108.5 seconds and 706 MiB; that output is preserved but is not the current submission.
 
-The selected follow-up candidate is `bn_view10_pair`, which groups each crop with its flip for one BN inference and averages probabilities over ten views. It reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. Its official full test pass is the current submission candidate below.
+The ten-view paired candidate reached **1763/2112 (.834754)** on official validation in 19.0 seconds and 1164 MiB on the GTX 1080 Ti. The user reported public **0.76627** for it. The eight-view method had lower validation accuracy, **1722/2112 (.815341)**, but the user reported a slightly higher public **0.76822**. It is the current submission candidate below.
 
 ## Official test artifacts and current submission
 
@@ -81,17 +81,23 @@ The bounded second validation round selected **Tent lr .003**, 1530/2112 on vali
 
 This earlier test run completed 12,288 images in 28.3 seconds with 3470 MiB peak VRAM on the GTX 1080 Ti. Its official CSV SHA-256 is `85d4d77e4b2876b158e75c844bdc2db857befacedb6f36b3c073cb429bb76775`, equal to its paired run log. The user reported a **0.72005 public score** for this artifact. The earlier lr .001 outputs remain intact; 166 test predictions differ between those Tent runs.
 
-The current validation-selected `bn_view10_pair` artifact was run from `CVPDLhw2/starter` at commit `a01bef5ec76176f6f9d8cfc5131e3268d87b5496`:
+The earlier ten-view paired artifact was run from `CVPDLhw2/starter` at commit `a01bef5ec76176f6f9d8cfc5131e3268d87b5496`:
 
 ```bash
 ../../.venv/bin/python run.py --method bn_view10_pair --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view10_pair --seed 0
 ```
 
-This official local test completed 12,288 images in **109.3 seconds** with **1164 MiB** peak VRAM on the GTX 1080 Ti. Its paired CSV/log hash is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`. The local time exceeds 90 seconds; the grading limit is measured on RTX 3090, which is not available here, so time compliance is **unverified**. No new public score or test accuracy is available. The root `submission.csv` and staged COOL test pair correspond to this method, while both earlier Tent artifacts remain preserved.
+This official local test completed 12,288 images in **109.3 seconds** with **1164 MiB** peak VRAM on the GTX 1080 Ti. Its paired CSV/log hash is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`. The local time exceeds 90 seconds; the grading limit is measured on RTX 3090, which is not available here, so time compliance is **unverified**. The user reported public **0.76627** for this artifact. Its CSV/log remain preserved.
 
-For a lower-cost fallback, `bn_view8` scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files and log-verified Kaggle filename are in `runs/final_bn_view8/`; the fallback `submission.csv` SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The root `submission.csv` remains the stronger ten-view candidate. Neither new candidate has a known public score.
+The current `bn_view8` artifact was run from `CVPDLhw2/starter` at commit `57c209a056ecbba04d3d0cf000194d8fd196635d`:
 
-To regenerate the Kaggle upload filename from the current `bn_view10_pair` official run, without rerunning the test stream, run from the repository root:
+```bash
+../../.venv/bin/python run.py --method bn_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view8 --seed 0
+```
+
+It scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files are in `runs/final_bn_view8/`; the CSV SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The user reported public **0.76822**. The root `submission.csv` and staged COOL test pair now correspond to this eight-view method. Grading RTX 3090 runtime and private accuracy remain unknown.
+
+To regenerate the Kaggle upload filename from the current `bn_view8` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -103,7 +109,7 @@ The Q4 report-only validation-image procedure is documented in [docs/q4_procedur
 The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_bn_view10_pair/q4_examples.png --q4-metadata runs/q4_bn_view10_pair/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_bn_view8/q4_examples.png --q4-metadata runs/q4_bn_view8/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules
