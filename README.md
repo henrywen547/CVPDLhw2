@@ -70,6 +70,12 @@ The single local test pass completed on the GTX 1080 Ti in 28.2 seconds with 347
 
 The Q4 report-only validation-image procedure is documented in [docs/q4_procedure.md](docs/q4_procedure.md). It is separate from the official adaptation and test code.
 
+Generate the three-page report PDF from the already selected Q4 figure:
+
+```bash
+../.venv/bin/python scripts/build_report.py --q4-image runs/q4_tent/q4_examples.png --q4-metadata runs/q4_tent/q4_examples.json --out runs/submission_staging/hw2_report_R14725031.pdf
+```
+
 ## Rules
 
 Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.
