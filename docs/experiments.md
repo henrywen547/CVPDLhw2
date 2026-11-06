@@ -6,6 +6,7 @@ All rows use the official `starter/run.py --split val`, the unchanged official `
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | source | `0b26fb09acd2749098eb20222d0cc947f9e1034b` | .545455 | 1152 | 2.7 | 706 | eval, no update |
 | tent | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .723485 | 1528 | 5.2 | 3470 | BN affine, 1 SGD step/batch, lr .001, momentum .9 |
+| tent, lr .003 (later validation only) | `96d5b578119115f78e9ac2fcbb632d5ad4657fb2` | .724432 | 1530 | 5.1 | 3470 | Same one-step Tent; lr .003, momentum .9; not used for the existing test CSV |
 | tent_come | `b6f2a6d886259421a1a53089dbfcc838f35f0083` | .722538 | 1526 | 5.3 | 3470 | Same as Tent; opinion entropy, K=1000 |
 | tent_gate, threshold .4 | `f3edf49af806057b8367bd0a5760b92022961cd8` | .723485 | 1528 | 5.2 | 3470 | Custom P2 rule; 33/33 batches updated, so gate was inactive |
 | tent_gate, threshold .25 | `0197bb0567388a83b2faffb4a57c032fb175fb2e` | .723485 | 1528 | 5.0 | 3370 | Custom P2 rule; 31/33 batches updated, 2 predictions changed, no accuracy gain |
@@ -53,3 +54,7 @@ With selected Git commit `1e4ee135fef0b29d870f8f608d82be82ad7c437c`, from `CVPDL
 The official harness completed 12,288 images in **28.2 seconds**, with **3470 MiB** peak sampled VRAM and **3294 MiB** maximum PyTorch reserved memory, on the local GTX 1080 Ti. The official output files are `runs/final_tent_001/test_pred.csv` and `runs/final_tent_001/test_run_log.json`. CSV validation found header `id,label`, exactly 12,288 unique IDs, integer labels in 0–19, and SHA-256 `d6ee738231872c47d1c9c744110dd12700a2797cee520569ffe51144d22c06e2`, equal to the log's `pred_sha256`. The test log contains no accuracy. This was one online test pass; no test labels were sought or used. Timing and VRAM still need confirmation on the grading RTX 3090.
 
 The Kaggle and COOL uploads are external submission steps. The original Q4 slide wording provided by the user requires eight validation images with predicted and true labels. The report-only Q4 selection and its narrow validation-data access are documented in `docs/q4_procedure.md`; no validation truth entered adaptation. A local submission staging directory contains the official test CSV/log, code, and reproduction Readme. Report materials are collected separately; the user will compose the PDF.
+
+## Later Tent diagnostic round
+
+The same-code P0/P1 comparison and full commands are in [tent_diagnostic_round.md](tent_diagnostic_round.md). It reproduced 1528/2112 at lr .001 and found 1530/2112 at lr .003. This is a validation-only candidate. The official test CSV, staged `test_pred.csv`, root `submission.csv`, and Q4 figure still correspond to lr .001. No second test pass or Kaggle submission was made in that round.

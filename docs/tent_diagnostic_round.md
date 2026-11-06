@@ -22,3 +22,24 @@ P0 will report official Top-1, harness seconds, peak VRAM, 2112-prediction diffe
 Change only Tent's SGD learning rate to **0.0003** and **0.003**, retaining 0.001 as the P0 control. Momentum remains 0.9; BN and prediction timing remain identical. Each candidate starts from the official source checkpoint in a fresh process. This is a three-point validation grid, not a search over the official test set. Record both positive and negative results with the exact commit and commands. Select by official overall validation Top-1; proxy confidence and entropy only explain behavior. If the best score ties, prefer the less complex existing 0.001 setting unless resource evidence favors another.
 
 COME and the source-free GOLD-inspired ablation were already tested at the prior setting, scoring 1526/2112 each. They remain comparison context, not this round's primary changes. The original author's full GOLD classification implementation uses source prototypes and warm-up and is not eligible as-is. Public leaderboard 0.84 and an informal reported 0.91 refer to different test subsets, so they are not comparable to the 0.72348 validation score.
+
+## Results (code commit `96d5b578119115f78e9ac2fcbb632d5ad4657fb2`)
+
+Every formal row below was run with diagnostics disabled on the same GTX 1080 Ti, the same official validation harness, checkpoint, seed, and commit. Separate diagnostic runs produced byte-identical prediction CSVs for source, Tent, gate, and both learning-rate candidates.
+
+| Method | Correct / 2112 | Top-1 | Harness seconds | Peak VRAM MiB | Updates / 33 | Mean BN-affine update L2 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| source | 1152 | .545455 | 2.4 | 706 | 0 | — |
+| bn_batch | 1526 | .722538 | 2.6 | 706 | 0 | — |
+| Tent lr .0003 | 1526 | .722538 | 5.1 | 3470 | 33 | .000982 |
+| Tent lr .001 | 1528 | .723485 | 5.1 | 3470 | 33 | .003284 |
+| Tent lr .003 | **1530** | **.724432** | 5.1 | 3470 | 33 | .009956 |
+| Tent gate .25, lr .001 | 1528 | .723485 | 5.0 | 3370 | 31 | .003017 |
+
+`bn_batch` differs from Tent lr .001 on only **2/2112** predictions. Gate .25 skipped two optimizer updates and also differs from Tent on **2/2112** predictions, while retaining the same overall accuracy. Relative to Tent lr .001, each alternate learning rate differs on two predictions. Source differs from Tent on 1110 predictions. These counts are label-free comparisons of official output CSVs; this round did not read `data/` directly to classify individual changes as right or wrong.
+
+The mean confidence for Tent lr .0003/.001/.003 was **.455/.459/.470** and the mean predictive entropy was **2.170/2.159/2.124 nat**. All three updated every batch. The slight monotonic validation gain across this bounded grid supports a learning-rate effect, but the whole difference from .001 to .003 is two images and does not establish generalization to the private test distribution. Batch BN statistics explain nearly all of the measured overall gain over the frozen source model in this setup; the additional BN-affine updates have small net validation effects.
+
+The new best **validation-only candidate** is Tent lr .003. The existing official test run and root `submission.csv` were generated with Tent lr .001 and remain unchanged. No new test run or Kaggle upload was made in this round. COME/GOLD work remains deferred pending a stronger diagnosis.
+
+Run directories: `runs/round2_source/`, `round2_bn_batch/`, `round2_tent_0003/`, `round2_tent_001/`, `round2_tent_003/`, and `round2_gate_025/`; each contains the official `val_pred.csv` and `val_run_log.json`. Diagnostic peers add `_diag` and include `diagnostics.jsonl`. Machine-readable comparisons are in ignored `runs/round2_p0_summary.json` and `runs/round2_full_summary.json`.

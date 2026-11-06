@@ -10,7 +10,7 @@ This is editable report content, not a PDF. Numbers are from the official valida
 
 ## Q2. Submitted method
 
-The validation-selected method is one-step Tent-style BatchNorm adaptation of the supplied 20-class ResNet-50. For each official batch of 64 normalized 160×160 images, the model uses current-batch BN statistics and makes one SGD update to only the BN affine weights and biases by minimizing the mean softmax entropy. SGD learning rate is 0.001, momentum 0.9; seed 0. The current batch's labels are predicted from logits **before** the optimizer step; the next batch sees the update. The method uses no source data, validation labels, other weights, replay, scheduled reset, image ID, or future batch. The official test was a single pass. Full command, code commit and checksum are in `Readme.md` of the local submission staging directory.
+The existing test artifact uses one-step Tent-style BatchNorm adaptation of the supplied 20-class ResNet-50. For each official batch of 64 normalized 160×160 images, the model uses current-batch BN statistics and makes one SGD update to only the BN affine weights and biases by minimizing the mean softmax entropy. The tested artifact used SGD learning rate 0.001, momentum 0.9; seed 0. The current batch's labels are predicted from logits **before** the optimizer step; the next batch sees the update. The method uses no source data, validation labels, other weights, replay, scheduled reset, image ID, or future batch. The official test was a single pass. Full command, code commit and checksum are in `Readme.md` of the local submission staging directory. If a later candidate replaces this test artifact, update Q2 and Q4 to match it.
 
 ## Q3. Strategies and official validation results
 
@@ -18,13 +18,16 @@ The validation-selected method is one-step Tent-style BatchNorm adaptation of th
 | --- | ---: | ---: | ---: | ---: | --- |
 | Frozen source | 1152 | .545455 | 2.7 | 706 | Baseline |
 | Current-batch BN statistics only | 1526 | .722538 | 2.6 | 706 | Large gain without trainable update |
-| Tent, one BN-affine update | **1528** | **.723485** | 5.2 | 3470 | Selected; two more correct than BN-only |
+| Tent, one BN-affine update, lr .001 | 1528 | .723485 | 5.2 | 3470 | Used for the existing test artifact |
+| Tent, lr .003, validation only | **1530** | **.724432** | 5.1 | 3470 | New validation-only candidate; no test run yet |
 | Tent + COME opinion entropy | 1526 | .722538 | 5.3 | 3470 | Two fewer correct than Tent at matched optimizer settings |
 | Tent + custom concentration gate, .4 | 1528 | .723485 | 5.2 | 3470 | Gate inactive: 33/33 batches updated |
 | Tent + custom concentration gate, .25 | 1528 | .723485 | 5.0 | 3370 | Skipped 2/33 updates; no accuracy gain |
 | Source-free GOLD-inspired subspace | 1526 | .722538 | 2.7 | 754 | Rank-8 online subspace and scale updated; no accuracy gain |
 
 The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. Timings and memory above are local GTX 1080 Ti results; they do not certify the RTX 3090 rerun. The single official test pass produced the required CSV in 28.2 seconds and 3470 MiB on this local GPU, without test accuracy access.
+
+The subsequent same-code LR round found .003 improved overall validation by two images over .001, while changing only two predicted labels. This narrow gain should be reported as a validation result, not as evidence of a private-test improvement. The existing test CSV and Q4 figure still correspond to lr .001.
 
 ## Q4. Eight validation examples
 

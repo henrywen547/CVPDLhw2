@@ -59,7 +59,7 @@ The new same-code Tent diagnostic and bounded learning-rate round is specified i
 
 ## Selected official test pass
 
-The current validation-selected method is `tent` at SGD lr .001 and momentum .9. It scored 1528/2112 on official validation; this does not reveal its test accuracy. From `CVPDLhw2/starter`, with `CVPDL_DIAG_JSONL` unset:
+The current **existing test artifact** was made with `tent` at SGD lr .001 and momentum .9. It scored 1528/2112 on official validation; this does not reveal its test accuracy. A later bounded validation-only round found lr .003 scored 1530/2112, but has not been used for a new test run or `submission.csv`. From `CVPDLhw2/starter`, with `CVPDL_DIAG_JSONL` unset, the exact command for the existing test artifact was:
 
 ```bash
 ../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
