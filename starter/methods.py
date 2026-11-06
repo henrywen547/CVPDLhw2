@@ -94,6 +94,14 @@ class BatchStatsSixView(BatchStatsMultiView):
     crop_borders = (8, 16)
 
 
+class BatchStatsEightView(BatchStatsMultiView):
+    crop_borders = (8, 16, 24)
+
+
+class BatchStatsTenView(BatchStatsMultiView):
+    crop_borders = (8, 16, 24, 32)
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -216,5 +224,6 @@ class TentGate(BatchNormEntropy):
 METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
+           "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,
            "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}
