@@ -36,6 +36,18 @@ cd ..
 
 The analysis verifies that diagnostic predictions exactly match the baseline. The findings and limitations are in [docs/data_exploration.md](docs/data_exploration.md).
 
+## Online adaptation comparisons
+
+`tent` and `tent_come` each make one forward pass and one SGD update per served batch. They return the current batch's predictions from **before** that update, so the next batch is the first to use newly adapted parameters. Only BatchNorm2d affine weight and bias receive gradients; batch statistics come from the current batch. Both methods start from the supplied checkpoint on each invocation. The defaults below are local experiment settings, not claims about the authors' published hyperparameters.
+
+```bash
+cd starter
+../../.venv/bin/python run.py --method tent --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
+../../.venv/bin/python run.py --method tent_come --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/come_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --come-k 1000
+```
+
+Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded separately after each run.
+
 ## Rules
 
 Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.
