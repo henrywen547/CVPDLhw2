@@ -42,13 +42,17 @@ The analysis verifies that diagnostic predictions exactly match the baseline. Th
 
 ```bash
 cd starter
+../../.venv/bin/python run.py --method bn_batch --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/bn_batch --seed 0
 ../../.venv/bin/python run.py --method tent --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9
 ../../.venv/bin/python run.py --method tent_come --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/come_lr001 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --come-k 1000
 ../../.venv/bin/python run.py --method tent_gate --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_gate_040 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --max-class-share 0.4
-../../.venv/bin/python run.py --method tent_gate --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_gate_025 --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --max-class-share 0.25
+../../.venv/bin/python run.py --method tent_gate --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/tent_gate_025_timed --seed 0 --tta-lr 0.001 --tta-momentum 0.9 --max-class-share 0.25
+../../.venv/bin/python run.py --method gold_sf --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/gold_sf_r8 --seed 0 --tta-lr 0.01 --tta-momentum 0.9 --gold-rank 8 --gold-alpha 0.1 --gold-confidence-threshold 0.5
 ```
 
-`tent_gate` is a custom P2 ablation: it skips the update if the current batch's largest predicted class exceeds 40%. The threshold is fixed before this run and does not use batch index, image ID, or labels. For validation-only confidence diagnostics, set `CVPDL_DIAG_JSONL=../runs/<run-name>/diagnostics.jsonl` before invoking either TTA method; this adds logging overhead and should be left unset for timing or final testing. The comparison script reads only official output and optional diagnostic logs.
+`bn_batch` isolates the effect of using current-batch BatchNorm statistics without parameter updates. `tent_gate` is a custom P2 ablation: it skips an update if the current batch's largest predicted class exceeds the selected threshold. Each threshold is fixed before its run and does not use batch index, image ID, or labels. For validation-only confidence diagnostics, set `CVPDL_DIAG_JSONL=../runs/<run-name>/diagnostics.jsonl` before invoking a TTA method; this adds logging overhead and should be left unset for timing or final testing. The comparison script reads only official output and optional diagnostic logs.
+
+`gold_sf` is a source-free **GOLD-inspired subspace ablation**, not the full author method. It uses only the supplied classifier weights and the current batch's predictions to maintain a rank-8 classifier-sensitive subspace. It trains an 8-value scaling vector with entropy minimization while freezing the backbone. Its eigenbasis is refreshed from current-batch information without a batch-index schedule. See the compliance review for omitted GOLD components.
 
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
 

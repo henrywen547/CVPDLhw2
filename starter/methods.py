@@ -12,6 +12,7 @@ import torch
 import torch.nn as nn
 
 from diagnostics import SourceDiagnostics
+from gold_source_free import GoldSourceFree
 
 
 class Source:
@@ -19,6 +20,22 @@ class Source:
 
     def __init__(self, model):
         self.model = model.eval()
+
+    @torch.no_grad()
+    def __call__(self, x):
+        return self.model(x).argmax(1)
+
+
+class BatchStats:
+    """Use only current-batch BN statistics without parameter updates."""
+
+    def __init__(self, model):
+        self.model = model.eval()
+        for module in self.model.modules():
+            if isinstance(module, nn.BatchNorm2d):
+                module.track_running_stats = False
+                module.running_mean = None
+                module.running_var = None
 
     @torch.no_grad()
     def __call__(self, x):
@@ -128,5 +145,6 @@ class TentGate(BatchNormEntropy):
                          max_class_share_for_update=max_class_share)
 
 
-METHODS = {"source": Source, "source_diag": SourceDiagnostics, "tent": Tent,
-           "tent_come": TentCOME, "tent_gate": TentGate}
+METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
+           "tent": Tent,
+           "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}

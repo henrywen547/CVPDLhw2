@@ -33,6 +33,9 @@ def main():
     ap.add_argument("--tta-momentum", type=float, default=0.9)
     ap.add_argument("--come-k", type=float, default=1000.0)
     ap.add_argument("--max-class-share", type=float, default=0.4)
+    ap.add_argument("--gold-rank", type=int, default=8)
+    ap.add_argument("--gold-alpha", type=float, default=0.1)
+    ap.add_argument("--gold-confidence-threshold", type=float, default=0.5)
     args = ap.parse_args()
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
     model = load_model(args.ckpt)
@@ -41,6 +44,10 @@ def main():
         if args.method == "tent_gate":
             kwargs["max_class_share"] = args.max_class_share
         method = METHODS[args.method](model, **kwargs)
+    elif args.method == "gold_sf":
+        method = METHODS[args.method](model, lr=args.tta_lr, momentum=args.tta_momentum,
+                                      rank=args.gold_rank, alpha=args.gold_alpha,
+                                      confidence_threshold=args.gold_confidence_threshold)
     else:
         method = METHODS[args.method](model)
     run_stream(method, args.data, args.split, args.out, extra_log=vars(args))
