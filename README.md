@@ -55,6 +55,7 @@ cd starter
 `gold_sf` is a source-free **GOLD-inspired subspace ablation**, not the full author method. It uses only the supplied classifier weights and the current batch's predictions to maintain a rank-8 classifier-sensitive subspace. It trains an 8-value scaling vector with entropy minimization while freezing the backbone. Its eigenbasis is refreshed from current-batch information without a batch-index schedule. See the compliance review for omitted GOLD components.
 
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
+The new same-code Tent diagnostic and bounded learning-rate round is specified in [docs/tent_diagnostic_round.md](docs/tent_diagnostic_round.md). It uses only the official validation stream and leaves the existing test submission unchanged.
 
 ## Selected official test pass
 

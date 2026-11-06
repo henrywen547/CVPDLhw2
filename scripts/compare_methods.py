@@ -35,6 +35,7 @@ def main():
     diagnostics = parse_named(args.diagnostic)
     output = {}
     common_ids = None
+    predictions_by_name = {}
     for name, location in runs.items():
         folder = Path(location)
         pairs = read_predictions(folder / "val_pred.csv")
@@ -42,6 +43,7 @@ def main():
         if common_ids is None:
             common_ids = ids
         assert ids == common_ids, "Methods must use the same official stream order"
+        predictions_by_name[name] = labels
         log = json.loads((folder / "val_run_log.json").read_text())
         batch = [proxy(labels[i:i + 64]) for i in range(0, len(labels), 64)]
         windows = [dict(start=i + 1, end=min(i + 256, len(labels)), **proxy(labels[i:i + 256]))
@@ -62,7 +64,14 @@ def main():
             result["mean_entropy"] = mean(entropy)
             if all("updated" in r for r in records):
                 result["updated_batches"] = sum(r["updated"] for r in records)
+            if all("update_l2" in r for r in records):
+                result["mean_update_l2"] = mean(r["update_l2"] for r in records)
+                result["max_update_l2"] = max(r["update_l2"] for r in records)
         output[name] = result
+    if "tent" in predictions_by_name:
+        tent_labels = predictions_by_name["tent"]
+        for name, labels in predictions_by_name.items():
+            output[name]["different_predictions_from_tent"] = sum(a != b for a, b in zip(labels, tent_labels))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(output, indent=2) + "\n")
     print("method acc seconds peak_mib adj_same batch_max_share mean_confidence mean_entropy updated_batches")
@@ -71,6 +80,9 @@ def main():
               f"{item['overall']['adjacent_same']:.3f}", f"{item['mean_batch_max_class_share']:.3f}",
               f"{item.get('mean_confidence', float('nan')):.3f}",
               f"{item.get('mean_entropy', float('nan')):.3f}", item.get("updated_batches", "-"))
+    if "tent" in predictions_by_name:
+        for name, item in output.items():
+            print("different_from_tent", name, item["different_predictions_from_tent"])
 
 
 if __name__ == "__main__":

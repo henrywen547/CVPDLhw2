@@ -67,6 +67,7 @@ class BatchNormEntropy:
                     parameters.extend((module.weight, module.bias))
         if not parameters:
             raise ValueError("No BatchNorm2d affine parameters found")
+        self.adapt_parameters = parameters
         self.optimizer = torch.optim.SGD(parameters, lr=lr, momentum=momentum)
         self.loss_name = loss_name
         self.come_k = come_k
@@ -102,6 +103,8 @@ class BatchNormEntropy:
         if self.max_class_share_for_update is not None:
             counts = prediction.bincount(minlength=logits.shape[1])
             update = bool(counts.max().item() / len(prediction) <= self.max_class_share_for_update)
+        before = ([parameter.detach().clone() for parameter in self.adapt_parameters]
+                  if update and self.diag_path is not None else None)
         if update:
             if self.loss_name == "tent":
                 loss = self.softmax_entropy(logits).mean()
@@ -110,6 +113,9 @@ class BatchNormEntropy:
             loss.backward()
             self.optimizer.step()
         if self.diag_path is not None:
+            update_l2 = (float(torch.sqrt(sum((parameter.detach() - old).square().sum()
+                                              for parameter, old in zip(self.adapt_parameters, before))).item())
+                         if before is not None else 0.0)
             probability = logits.detach().softmax(1)
             record = dict(
                 batch=self.batch,
@@ -118,6 +124,7 @@ class BatchNormEntropy:
                 confidence=probability.max(1).values.cpu().tolist(),
                 entropy=(-(probability * probability.clamp_min(1e-12).log()).sum(1)).cpu().tolist(),
                 updated=update,
+                update_l2=update_l2,
             )
             with self.diag_path.open("a") as file:
                 file.write(json.dumps(record) + "\n")
