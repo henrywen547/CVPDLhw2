@@ -39,7 +39,7 @@ def main():
     args = ap.parse_args()
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
     model = load_model(args.ckpt)
-    if args.method in ("tent", "tent_come", "tent_gate"):
+    if args.method in ("tent", "tent_post", "tent_come", "tent_gate"):
         kwargs = dict(lr=args.tta_lr, momentum=args.tta_momentum, come_k=args.come_k)
         if args.method == "tent_gate":
             kwargs["max_class_share"] = args.max_class_share

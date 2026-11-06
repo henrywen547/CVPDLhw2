@@ -42,6 +42,16 @@ class BatchStats:
         return self.model(x).argmax(1)
 
 
+class BatchStatsFlip(BatchStats):
+    """Average current-batch BN predictions from original and horizontal-flip views."""
+
+    @torch.no_grad()
+    def __call__(self, x):
+        original = self.model(x).softmax(1)
+        flipped = self.model(x.flip(-1)).softmax(1)
+        return (original + flipped).argmax(1)
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -137,6 +147,15 @@ class Tent(BatchNormEntropy):
         super().__init__(model, loss_name="tent", lr=lr, momentum=momentum, come_k=come_k)
 
 
+class TentPost(Tent):
+    """Update on the served batch, then predict that same batch once more."""
+
+    def __call__(self, x):
+        super().__call__(x)
+        with torch.no_grad():
+            return self.model(x).argmax(1)
+
+
 class TentCOME(BatchNormEntropy):
     def __init__(self, model, *, lr=0.001, momentum=0.9, come_k=1000):
         super().__init__(model, loss_name="come", lr=lr, momentum=momentum, come_k=come_k)
@@ -153,5 +172,5 @@ class TentGate(BatchNormEntropy):
 
 
 METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": BatchStats,
-           "tent": Tent,
+           "bn_flip": BatchStatsFlip, "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}

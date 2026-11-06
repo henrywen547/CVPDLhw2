@@ -57,6 +57,8 @@ cd starter
 Paper code and compliance review: [docs/paper_method_review.md](docs/paper_method_review.md). Experiment outcomes are recorded in [docs/experiments.md](docs/experiments.md).
 The same-code Tent diagnostic and bounded learning-rate round is recorded in [docs/tent_diagnostic_round.md](docs/tent_diagnostic_round.md). It selected lr .003 by official validation Top-1.
 
+After the user reported a 0.72005 public score for that artifact, [docs/round3_plan.md](docs/round3_plan.md) predeclared two validation probes: `bn_flip` averages original and horizontal-flip probabilities with current-batch BN; `tent_post` predicts the current batch after one Tent update. These remain experimental and do not change the current `submission.csv` unless official validation supports a new selection.
+
 ## Official test artifacts and current submission
 
 The earlier Tent lr .001 test pass is preserved at `runs/final_tent_001/`. It scored 1528/2112 on validation; its exact command, from `CVPDLhw2/starter` with `CVPDL_DIAG_JSONL` unset, was:
