@@ -77,6 +77,12 @@ The script verifies the paired run-log hash, `id,label` header, 12,288 unique ID
 
 The single local test pass completed on the GTX 1080 Ti in 28.2 seconds with 3470 MiB sampled peak VRAM. The CSV contains 12,288 unique IDs and valid 0–19 labels; its SHA-256 matches the matching run log. No test accuracy is available. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
 
+The bounded second validation round selected Tent at lr .003 (1530/2112) for a **separate** official test pass from the original checkpoint. Keep the earlier lr .001 run intact. The command for the new pass, from `CVPDLhw2/starter`, is:
+
+```bash
+../../.venv/bin/python run.py --method tent --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_tent_003 --seed 0 --tta-lr 0.003 --tta-momentum 0.9
+```
+
 The Q4 report-only validation-image procedure is documented in [docs/q4_procedure.md](docs/q4_procedure.md). It is separate from the official adaptation and test code. Report source files and the Q4 figure are collected under `runs/report_materials/`; the PDF is left for the user to compose.
 The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
 
