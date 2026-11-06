@@ -4,6 +4,9 @@ A method is a callable: method(x) -> LongTensor of labels in {0..19} for the nor
 It may update its own state (BN statistics, parameters, memory, ...) as the stream goes on.
 """
 import math
+import json
+import os
+from pathlib import Path
 
 import torch
 import torch.nn as nn
@@ -29,7 +32,8 @@ class BatchNormEntropy:
     COME changes only the loss. No source data, replay, or extra weights are used.
     """
 
-    def __init__(self, model, *, loss_name, lr, momentum, come_k):
+    def __init__(self, model, *, loss_name, lr, momentum, come_k,
+                 max_class_share_for_update=None):
         if lr <= 0 or not 0 <= momentum < 1 or come_k <= 0:
             raise ValueError("Require lr > 0, 0 <= momentum < 1, come_k > 0")
         self.model = model.train()
@@ -49,6 +53,14 @@ class BatchNormEntropy:
         self.optimizer = torch.optim.SGD(parameters, lr=lr, momentum=momentum)
         self.loss_name = loss_name
         self.come_k = come_k
+        self.max_class_share_for_update = max_class_share_for_update
+        self.diag_path = None
+        diagnostic_output = os.environ.get("CVPDL_DIAG_JSONL")
+        if diagnostic_output:
+            self.diag_path = Path(diagnostic_output)
+            self.diag_path.parent.mkdir(parents=True, exist_ok=True)
+            self.diag_path.write_text("")
+        self.batch = 0
 
     @staticmethod
     def softmax_entropy(logits):
@@ -69,12 +81,30 @@ class BatchNormEntropy:
         self.optimizer.zero_grad(set_to_none=True)
         logits = self.model(x)
         prediction = logits.detach().argmax(1)
-        if self.loss_name == "tent":
-            loss = self.softmax_entropy(logits).mean()
-        else:
-            loss = self.opinion_entropy(logits).mean()
-        loss.backward()
-        self.optimizer.step()
+        update = True
+        if self.max_class_share_for_update is not None:
+            counts = prediction.bincount(minlength=logits.shape[1])
+            update = bool(counts.max().item() / len(prediction) <= self.max_class_share_for_update)
+        if update:
+            if self.loss_name == "tent":
+                loss = self.softmax_entropy(logits).mean()
+            else:
+                loss = self.opinion_entropy(logits).mean()
+            loss.backward()
+            self.optimizer.step()
+        if self.diag_path is not None:
+            probability = logits.detach().softmax(1)
+            record = dict(
+                batch=self.batch,
+                n=len(prediction),
+                prediction=prediction.cpu().tolist(),
+                confidence=probability.max(1).values.cpu().tolist(),
+                entropy=(-(probability * probability.clamp_min(1e-12).log()).sum(1)).cpu().tolist(),
+                updated=update,
+            )
+            with self.diag_path.open("a") as file:
+                file.write(json.dumps(record) + "\n")
+        self.batch += 1
         return prediction
 
 
@@ -88,4 +118,15 @@ class TentCOME(BatchNormEntropy):
         super().__init__(model, loss_name="come", lr=lr, momentum=momentum, come_k=come_k)
 
 
-METHODS = {"source": Source, "source_diag": SourceDiagnostics, "tent": Tent, "tent_come": TentCOME}
+class TentGate(BatchNormEntropy):
+    """Custom P2 ablation: skip updates for concentrated current predictions."""
+
+    def __init__(self, model, *, lr=0.001, momentum=0.9, come_k=1000, max_class_share=0.4):
+        if not 0 < max_class_share <= 1:
+            raise ValueError("Require 0 < max_class_share <= 1")
+        super().__init__(model, loss_name="tent", lr=lr, momentum=momentum, come_k=come_k,
+                         max_class_share_for_update=max_class_share)
+
+
+METHODS = {"source": Source, "source_diag": SourceDiagnostics, "tent": Tent,
+           "tent_come": TentCOME, "tent_gate": TentGate}

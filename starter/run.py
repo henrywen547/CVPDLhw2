@@ -32,12 +32,15 @@ def main():
     ap.add_argument("--tta-lr", type=float, default=0.001)
     ap.add_argument("--tta-momentum", type=float, default=0.9)
     ap.add_argument("--come-k", type=float, default=1000.0)
+    ap.add_argument("--max-class-share", type=float, default=0.4)
     args = ap.parse_args()
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
     model = load_model(args.ckpt)
-    if args.method in ("tent", "tent_come"):
-        method = METHODS[args.method](model, lr=args.tta_lr, momentum=args.tta_momentum,
-                                      come_k=args.come_k)
+    if args.method in ("tent", "tent_come", "tent_gate"):
+        kwargs = dict(lr=args.tta_lr, momentum=args.tta_momentum, come_k=args.come_k)
+        if args.method == "tent_gate":
+            kwargs["max_class_share"] = args.max_class_share
+        method = METHODS[args.method](model, **kwargs)
     else:
         method = METHODS[args.method](model)
     run_stream(method, args.data, args.split, args.out, extra_log=vars(args))
