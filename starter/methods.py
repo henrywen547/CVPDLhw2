@@ -120,6 +120,40 @@ class BatchStatsTenViewPaired(BatchStats):
         return probabilities.argmax(1)
 
 
+class BatchStatsTenViewPairedLogits(BatchStats):
+    """The same paired views, fused by raw logits instead of probabilities."""
+
+    @torch.no_grad()
+    def __call__(self, x):
+        scores = None
+        for border in (0, 8, 16, 24, 32):
+            crop = x if border == 0 else x[:, :, border:-border, border:-border]
+            view = (crop if border == 0 else
+                    F.interpolate(crop, size=x.shape[-2:], mode="bilinear",
+                                  align_corners=False))
+            paired = torch.cat((view, view.flip(-1)), dim=0)
+            output = self.model(paired)
+            pair_sum = output[:len(x)] + output[len(x):]
+            scores = pair_sum if scores is None else scores + pair_sum
+        return scores.argmax(1)
+
+
+class BatchStatsTenViewAll(BatchStats):
+    """Infer all ten current-image views together with pooled batch BN statistics."""
+
+    @torch.no_grad()
+    def __call__(self, x):
+        views = []
+        for border in (0, 8, 16, 24, 32):
+            crop = x if border == 0 else x[:, :, border:-border, border:-border]
+            view = (crop if border == 0 else
+                    F.interpolate(crop, size=x.shape[-2:], mode="bilinear",
+                                  align_corners=False))
+            views.extend((view, view.flip(-1)))
+        probability = self.model(torch.cat(views, dim=0)).softmax(1)
+        return probability.reshape(len(views), len(x), -1).sum(0).argmax(1)
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -244,5 +278,7 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,
            "bn_view10_pair": BatchStatsTenViewPaired,
+           "bn_view10_pair_logits": BatchStatsTenViewPairedLogits,
+           "bn_view10_all": BatchStatsTenViewAll,
            "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}
