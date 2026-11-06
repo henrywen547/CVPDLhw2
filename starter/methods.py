@@ -102,6 +102,24 @@ class BatchStatsTenView(BatchStatsMultiView):
     crop_borders = (8, 16, 24, 32)
 
 
+class BatchStatsTenViewPaired(BatchStats):
+    """Process each scale and its horizontal flip in one combined BN batch."""
+
+    @torch.no_grad()
+    def __call__(self, x):
+        probabilities = None
+        for border in (0, 8, 16, 24, 32):
+            crop = x if border == 0 else x[:, :, border:-border, border:-border]
+            view = (crop if border == 0 else
+                    F.interpolate(crop, size=x.shape[-2:], mode="bilinear",
+                                  align_corners=False))
+            paired = torch.cat((view, view.flip(-1)), dim=0)
+            output = self.model(paired).softmax(1)
+            pair_sum = output[:len(x)] + output[len(x):]
+            probabilities = pair_sum if probabilities is None else probabilities + pair_sum
+        return probabilities.argmax(1)
+
+
 class BatchNormEntropy:
     """One online update per served batch; return its pre-update predictions.
 
@@ -225,5 +243,6 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,
+           "bn_view10_pair": BatchStatsTenViewPaired,
            "tent": Tent, "tent_post": TentPost,
            "tent_come": TentCOME, "tent_gate": TentGate, "gold_sf": GoldSourceFree}
