@@ -89,6 +89,8 @@ The current validation-selected `bn_view10_pair` artifact was run from `CVPDLhw2
 
 This official local test completed 12,288 images in **109.3 seconds** with **1164 MiB** peak VRAM on the GTX 1080 Ti. Its paired CSV/log hash is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`. The local time exceeds 90 seconds; the grading limit is measured on RTX 3090, which is not available here, so time compliance is **unverified**. No new public score or test accuracy is available. The root `submission.csv` and staged COOL test pair correspond to this method, while both earlier Tent artifacts remain preserved.
 
+For a lower-cost fallback, `bn_view8` scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files and log-verified Kaggle filename are in `runs/final_bn_view8/`; the fallback `submission.csv` SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The root `submission.csv` remains the stronger ten-view candidate. Neither new candidate has a known public score.
+
 To regenerate the Kaggle upload filename from the current `bn_view10_pair` official run, without rerunning the test stream, run from the repository root:
 
 ```bash

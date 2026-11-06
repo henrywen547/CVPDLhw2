@@ -80,3 +80,7 @@ At Git commit `a01bef5ec76176f6f9d8cfc5131e3268d87b5496`, from `CVPDLhw2/starter
 ```
 
 The paired official test outputs are `runs/final_bn_view10_pair/test_pred.csv` and `test_run_log.json`. The full local GTX 1080 Ti stream took **109.3 seconds**, with **1164 MiB** sampled peak VRAM; the CSV SHA-256 is `02baf91683a615f0af84b568a4a6699529dc5f8965e9c998938c53103ddb70f1`, matching its log. The local time is above 90 seconds. Whether it passes the grading RTX 3090 limit is not yet measured; no public result for this new artifact is available. The older Tent run and CSV remain intact.
+
+### Lower-cost eight-view fallback
+
+At commit `57c209a056ecbba04d3d0cf000194d8fd196635d`, the same official test stream was run independently with `--method bn_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_bn_view8 --seed 0`, from `CVPDLhw2/starter`. Its local GTX 1080 Ti test took **87.3 seconds**, **706 MiB** peak VRAM, and produced a paired official CSV/log. The separately generated `runs/final_bn_view8/submission.csv` matches the official CSV (SHA-256 `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`). Its validation result was **1722/2112 (.8153409)**. This fallback is below 90 seconds locally; RTX 3090 performance and its public score remain unmeasured. The root `submission.csv` continues to reference the higher-validation ten-view candidate.
