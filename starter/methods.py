@@ -6,6 +6,8 @@ It may update its own state (BN statistics, parameters, memory, ...) as the stre
 import torch
 import torch.nn as nn
 
+from diagnostics import SourceDiagnostics
+
 
 class Source:
     """No adaptation."""
@@ -18,4 +20,4 @@ class Source:
         return self.model(x).argmax(1)
 
 
-METHODS = {"source": Source}
+METHODS = {"source": Source, "source_diag": SourceDiagnostics}

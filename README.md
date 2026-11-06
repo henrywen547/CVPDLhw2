@@ -20,6 +20,15 @@ cd starter
 
 `source` runs in evaluation mode and uses `torch.no_grad()`. The official harness writes `val_pred.csv`, `val_run_log.json`, and prints validation accuracy. The run uses the official batch size of 64 and ImageNet mean/std normalization. `harness.py` remains unchanged.
 
+## Validation diagnostics
+
+The optional `source_diag` method receives the same normalized batches from the official harness and writes prediction and image summaries without labels or IDs. It is for validation exploration only; it adds logging overhead and should not be used for final timing or test submission.
+
+```bash
+cd starter
+CVPDL_DIAG_JSONL=../runs/source_diag/image_summaries.jsonl ../../.venv/bin/python run.py --method source_diag --split val --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/source_diag --seed 0
+```
+
 ## Rules
 
 Only the supplied checkpoint may be used. Adaptation may only use the current and previously served unlabeled batches. Validation labels are reserved for official evaluation and method selection. Never modify the harness, manually read `data/`, or view test labels.
