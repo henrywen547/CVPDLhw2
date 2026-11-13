@@ -23,3 +23,6 @@ LAME-inspired one-view BN,1594,2112,0.7547348485,20.9280,2.7,706,"current-batch 
 LAME-inspired six-view BN,1772,2112,0.8390151515,29.3561,11.7,808,"six-view BN; averaged features and probabilities; cosine five-neighbor output graph; public 0.81266",06a95fc04d8de1d80a50183438c663773a058d65,runs/round4_lame_view6/val_run_log.json
 LAME-inspired four-view BN,1704,2112,0.8068181818,26.1364,8.1,768,"four-view BN; same graph and output updates; stopped after validation",902672e5812783ea917af4e0a5e3b55d4ac87a68,runs/round5_lame_view4/val_run_log.json
 LAME-inspired eight-view BN,1827,2112,0.8650568182,31.9602,15.3,848,"eight-view BN; same graph and output updates; selected test CSV; public 0.81835",902672e5812783ea917af4e0a5e3b55d4ac87a68,runs/round5_lame_view8/val_run_log.json
+LAME-inspired eight-view k3,1779,2112,0.8423295455,29.6875,15.3,848,"eight-view BN; cosine three-neighbor graph; round 6",e4a3478,runs/round6_lame_view8_k3/val_run_log.json
+LAME-inspired eight-view k10,1901,2112,0.9000946970,35.4640,15.3,848,"eight-view BN; cosine ten-neighbor graph; round 6; separate test candidate",e4a3478,runs/round6_lame_view8_k10/val_run_log.json
+LAME-inspired eight-view previous-batch memory,1769,2112,0.8375946970,29.2140,15.4,848,"eight-view BN; five-neighbor graph plus fixed previous-batch nodes; round 6",e4a3478,runs/round6_lame_view8_mem/val_run_log.json

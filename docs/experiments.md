@@ -118,3 +118,7 @@ The user reported **public 0.81835** for `runs/final_lame_view8/submission.csv`,
 - The Q4 figure was rebuilt from the official `lame_view8` validation predictions (`runs/q4_lame_view8/`).
 
 The six-view and all earlier artifacts remain preserved. Private accuracy and grading RTX 3090 runtime are unmeasured; the local full stream is only 2.5 seconds under 90 seconds on the GTX 1080 Ti.
+
+## Round 6: LAME graph variants at fixed eight-view cost
+
+At commit `e4a3478`, three predeclared graph variants of `lame_view8` were compared with a same-commit control (1827/2112, identical predictions to round 5). `lame_view8_k3` scored 1779, `lame_view8_k10` scored **1901/2112 (.900095)**, and the previous-batch fixed-memory variant `lame_view8_mem` scored 1769. All took 15.3–15.4 s / 848 MiB on validation. Only `k10` met the ≥10-image gain rule. Its one full test pass took **87.5 s / 848 MiB** locally, and its verified upload copy is `runs/final_lame_view8_k10/submission.csv` (SHA-256 `98c48cb5…8df15`). Public score is pending, and the root submission remains `lame_view8`. Details: [round6_lame_graph_plan.md](round6_lame_graph_plan.md).

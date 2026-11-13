@@ -24,4 +24,23 @@ All runs use the official validation harness, the supplied checkpoint, seed 0, d
 
 ## Results
 
-Pending.
+All runs used code commit `e4a3478`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s | Peak VRAM MiB | Val predictions differing from control |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `lame_view8` (control) | 1827 | .865057 | — | 15.3 | 848 | 0 (identical to the round-5 run) |
+| `lame_view8_k3` | 1779 | .842330 | −48 | 15.3 | 848 | — |
+| `lame_view8_k10` | **1901** | **.900095** | **+74** | 15.3 | 848 | 98 |
+| `lame_view8_mem` | 1769 | .837595 | −58 | 15.4 | 848 | — |
+
+- The control reproduced the round-5 predictions exactly, so the comparison is not affected by run-to-run noise.
+- Accuracy rises with neighbor count (3 → 5 → 10). Following the predeclared rule, no further `k` values were tried this round.
+- The one-batch fixed memory hurt by 58 images; the branch is stopped and no combined variant was run. A plausible reason is that the previous batch's refined labels add confirmation bias, including across domain changes, but this was not diagnosed.
+
+`lame_view8_k10` received the round's single full test pass at the same commit:
+
+```bash
+../../.venv/bin/python run.py --method lame_view8_k10 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8_k10 --seed 0
+```
+
+It took **87.5 s / 848 MiB** locally, the same as `lame_view8`, since graph density costs nothing measurable. The verified upload copy is `runs/final_lame_view8_k10/submission.csv` (SHA-256 `98c48cb5b4001f0f810d04ae13f4402d6b68c36265a688cba21516667bf8df15`, matching its log); the reproduction snapshot is in `runs/lame_view8_k10_candidate/`. Against `lame_view8`, **1068/12,288 (8.7%)** test predictions differ, versus 98/2112 (4.6%) on validation, so the denser graph changes the test stream more. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8` until the user's feedback.
