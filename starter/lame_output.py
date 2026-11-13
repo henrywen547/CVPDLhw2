@@ -186,6 +186,24 @@ class LameK20Ema01(LameEightViewK20RobustBN):
     bn_mode, bn_alpha = "ema", 0.1
 
 
+class LameK20Ema02(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "ema", 0.2
+
+
+class LameK20Ema05(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "ema", 0.5
+
+
+class LameK15Ema03(LameEightViewK20RobustBN):
+    neighbors = 15
+    bn_mode, bn_alpha = "ema", 0.3
+
+
+class LameK30Ema03(LameEightViewK20RobustBN):
+    neighbors = 30
+    bn_mode, bn_alpha = "ema", 0.3
+
+
 class LameEightViewMemory(LameEightView):
     """Previous served batch as fixed graph nodes; one batch of memory."""
 
