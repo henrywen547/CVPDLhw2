@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from robust_bn import replace_batchnorm
+
 
 def adjust_outputs(probability, features, *, neighbors=5, steps=10):
     """Apply the paper's probability update to a symmetric local feature graph."""
@@ -80,6 +82,9 @@ class LameCurrentBatch:
     def _capture_feature(self, _module, _inputs, output):
         self.feature = output.flatten(1)
 
+    def _select_view(self, index):
+        """Hook for view-specific normalization state; no-op by default."""
+
     @torch.no_grad()
     def __call__(self, x):
         views = [x]
@@ -93,7 +98,8 @@ class LameCurrentBatch:
 
         probability = None
         feature_sum = None
-        for view in views:
+        for index, view in enumerate(views):
+            self._select_view(index)
             output = self.model(view).softmax(dim=1)
             probability = output if probability is None else probability + output
             feature_sum = self.feature if feature_sum is None else feature_sum + self.feature
@@ -143,6 +149,41 @@ class LameEightViewK20(LameEightView):
 
 class LameEightViewK30(LameEightView):
     neighbors = 30
+
+
+class LameEightViewK20RobustBN(LameEightViewK20):
+    """k = 20 eight-view LAME with source-mixed or per-view EMA BN statistics."""
+
+    bn_mode = "mix"
+    bn_alpha = 1.0
+
+    def __init__(self, model):
+        self.robust_bn = replace_batchnorm(model, self.bn_mode, self.bn_alpha)
+        super().__init__(model)
+
+    def _select_view(self, index):
+        for module in self.robust_bn:
+            module.view = index
+
+
+class LameK20Mix10(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "mix", 1.0
+
+
+class LameK20Mix09(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "mix", 0.9
+
+
+class LameK20Mix07(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "mix", 0.7
+
+
+class LameK20Ema03(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "ema", 0.3
+
+
+class LameK20Ema01(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha = "ema", 0.1
 
 
 class LameEightViewMemory(LameEightView):
