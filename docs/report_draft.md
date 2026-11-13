@@ -12,7 +12,7 @@ Q1 pairs the paper behind the submitted method (LAME, online TTA on non-i.i.d. s
 - *Method.* LAME freezes the pretrained model and corrects only its **outputs**. For a batch with source predictions `q_i` and features `φ(x_i)`, it finds simplex assignments `z_i` that minimize `Σ_i KL(z_i ‖ q_i) − Σ_{i,j} w_ij z_iᵀ z_j`, where `w_ij` is a feature affinity such as a kNN graph. The KL term keeps assignments close to the model; the Laplacian term pushes nearby samples toward the same class. A concave-convex procedure yields the closed-form, monotonically improving update `z_ik ∝ q_ik exp(Σ_j w_ij z_jk)`, iterated to convergence. The only hyperparameter is the affinity function.
 - *Strengths.* No gradients and no second forward pass, so it runs about twice as fast as Tent and needs about half the memory (Fig. 6). Because parameters never change, it cannot degrade over a long stream. With one fixed hyperparameter set, it improves on the non-adaptive baseline across scenarios, ResNet-50 training procedures (MSRA, torchvision, SimCLR), and architectures (ResNet-18/50/101, EfficientNet-B4, ViT-B). The average gain is 6.7 points in non-i.i.d. scenarios and up to 15 points on ImageNet-V2.
 - *Weaknesses.* It does not help in standard i.i.d., class-balanced covariate shift and can fall about 0.5 points below the baseline there. Because the feature extractor is frozen, it cannot repair poor features or accumulate knowledge across batches. It also relies on informative neighbors within a batch and on the manifold-smoothness assumption in the source feature space.
-- *Relation to HW2.* The validation permutation test indicated temporally correlated predictions. One-step Tent gained only two images over current-batch BN statistics, whereas LAME-style correction added 68 images with one view and 90 with six views. Our submitted variant differs from the paper in four ways: it uses current-batch BN statistics instead of the frozen source BN, averages eight test-time views, uses a cosine five-neighbor graph, and runs ten fixed iterations instead of iterating to convergence. It is therefore labeled **LAME-inspired**.
+- *Relation to HW2.* The validation permutation test indicated temporally correlated predictions. One-step Tent gained only two images over current-batch BN statistics, whereas LAME-style correction added 68 images with one view and 90 with six views. Our submitted variant differs from the paper in four ways: it uses current-batch BN statistics instead of the frozen source BN, averages eight test-time views, uses a cosine ten-neighbor graph, and runs ten fixed iterations instead of iterating to convergence. It is therefore labeled **LAME-inspired**.
 
 **COME — fully test-time adaptation.** Zhang et al., *COME: Test-time Adaption by Conservatively Minimizing Entropy*, ICLR 2025 ([paper](https://proceedings.iclr.cc/paper_files/paper/2025/hash/2ea18fdc667e0ef2ad82b2b4d65147ad-Abstract-Conference.html), [author code](https://github.com/BlueWhaleLab/COME)).
 
@@ -25,14 +25,14 @@ Q1 pairs the paper behind the submitted method (LAME, online TTA on non-i.i.d. s
 
 ## Q2. Submitted method
 
-The current test artifact uses the supplied 20-class ResNet-50 with current-view BatchNorm statistics and eight-view prediction (`lame_view8`).
+The current test artifact uses the supplied 20-class ResNet-50 with current-view BatchNorm statistics, eight-view prediction, and a ten-neighbor output graph (`lame_view8_k10`).
 
 - **Views.** For each official batch of 64 normalized 160×160 images, the method runs eight views in sequence: the original and horizontal flip at 100%, 90%, 80%, and 70% center crops, each resized back to 160×160.
 - **Fusion.** Softmax probabilities and average-pool features are averaged across views.
-- **Output correction.** Within the current batch, the averaged features form a symmetric cosine five-neighbor graph. Ten fixed LAME-inspired output-assignment updates, `z ← softmax(log p + W z)`, refine the averaged probabilities before argmax.
+- **Output correction.** Within the current batch, the averaged features form a symmetric cosine ten-neighbor graph (negative similarities clamped to zero). Ten fixed LAME-inspired output-assignment updates, `z ← softmax(log p + W z)`, refine the averaged probabilities before argmax.
 - **No loss, no updates.** There is no loss function and **no optimizer update**. The method uses no future batch, image ID, labels, extra weights, source images, or replay.
 
-This is an independent local variant, not the complete author implementation. It reached **1827/2112 (.865057)** official validation and **public 0.81835**, as reported by the user. The full local GTX 1080 Ti test took **87.5 seconds** and **848 MiB**; RTX 3090 runtime remains unverified. Full command, code commit, and checksum are in the staged `Readme.md`.
+This is an independent local variant, not the complete author implementation. It reached **1901/2112 (.900095)** official validation and **public 0.87483**, as reported by the user. The full local GTX 1080 Ti test took **87.5 seconds** and **848 MiB**; RTX 3090 runtime remains unverified. Full command, code commit, and checksum are in the staged `Readme.md`.
 
 ## Q3. Strategies and official validation results
 
@@ -55,15 +55,18 @@ This is an independent local variant, not the complete author implementation. It
 | LAME-inspired output correction, one BN view | 1594 | .754735 | +20.9280 | 2.7 | 706 | Graph correction improves on one-view BN |
 | LAME-inspired output correction, six BN views | 1772 | .839015 | +29.3561 | 11.7 | 808 | Public 0.81266; full local test 66.2 s |
 | LAME-inspired output correction, four BN views | 1704 | .806818 | +26.1364 | 8.1 | 768 | Bounded view-count check; no test pass |
-| LAME-inspired output correction, eight BN views | **1827** | **.865057** | **+31.9602** | 15.3 | 848 | **Submitted; public 0.81835**; full local test 87.5 s |
+| LAME-inspired output correction, eight BN views | 1827 | .865057 | +31.9602 | 15.3 | 848 | Public 0.81835; full local test 87.5 s |
+| Eight views, three-neighbor graph | 1779 | .842330 | +29.6875 | 15.3 | 848 | Sparser graph hurts |
+| Eight views, ten-neighbor graph | **1901** | **.900095** | **+35.4640** | 15.3 | 848 | **Submitted; public 0.87483**; full local test 87.5 s |
+| Eight views, five neighbors + previous-batch fixed nodes | 1769 | .837595 | +29.2140 | 15.4 | 848 | Cross-batch memory hurts |
 
 The frozen model's adjacent **predicted** same-class rate was .203; Tent reduced it to .134. This is only a prediction-sequence diagnostic, not per-window ground-truth accuracy. The original fixed-model permutation check found the .2035 local-256-window rate above all 10,000 fixed-window-class-count shuffles (null mean .1384), motivating a correlated-batch ablation. The .25 gate's negative result does not prove the true class sequence lacks correlation. The eight-view method improved validation by 192 images over Tent lr .003. The deeper ten-view method improved validation by another 41 images, yet scored 0.00195 lower on the observed public subset. This demonstrates the limits of validation-only model selection here; private accuracy remains unknown. Timings and memory above are local GTX 1080 Ti results and do not certify the RTX 3090 rerun. The complete experiment list, including negative results for post-update Tent and alternative ten-view fusion, is in `q3_results.csv`.
 
-The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. LAME-inspired correction gave the largest single-step public gain (eight-view BN 0.76822 → six-view LAME 0.81266). Eight LAME views then added 55 validation images but only 0.00569 public accuracy. This is another sign that validation gains from extra crop scales transfer only partly to the test stream. The current root official test CSV, staged COOL files, and Q4 metadata correspond to `lame_view8`.
+The same-code LR round found .003 improved overall validation by two images over .001. The multiview gain is larger. LAME-inspired correction gave the largest single-step public gain (eight-view BN 0.76822 → six-view LAME 0.81266). Eight LAME views then added 55 validation images but only 0.00569 public accuracy. This is another sign that validation gains from extra crop scales transfer only partly to the test stream. By contrast, a denser graph at the same cost (ten instead of five neighbors) gained 74 validation images and 0.05648 public accuracy, exceeding the 0.84 strong baseline. Graph density mattered more than the number of views. A fixed memory of the previous batch's refined outputs hurt, so the method stays per-batch. The current root official test CSV, staged COOL files, and Q4 metadata correspond to `lame_view8_k10`.
 
 ## Q4. Eight validation examples
 
-The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official `lame_view8` validation prediction CSV (`runs/round5_lame_view8/val_pred.csv`, SHA-256 `228f46333107c6ecc72edfdbd291f24695270da85407c9d81ec243b6b5b00ce8`). Only **after** evaluation, and only for report preparation, did it read validation-only labels and the eight selected validation images. The Q4 image labels did not enter the method or test pass; method selection used official aggregate validation and user-reported public scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
+The original slide wording provided by the user explicitly requires eight validation images with predicted and ground-truth labels. `scripts/build_q4_figure.py` used the completed official `lame_view8_k10` validation prediction CSV (`runs/round6_lame_view8_k10/val_pred.csv`, SHA-256 `55285556c65c4cf2c67e0dd42ed9dd1be7c494bbba53beace84799139f4f9c01`). Only **after** evaluation, and only for report preparation, did it read validation-only labels and the eight selected validation images. The Q4 image labels did not enter the method or test pass; method selection used official aggregate validation and user-reported public scores. The procedure and narrow interpretation of the data rule are recorded in `docs/q4_procedure.md`.
 
 | Result | Stream position | Predicted class | Ground-truth class |
 | --- | ---: | --- | --- |
@@ -73,7 +76,7 @@ The original slide wording provided by the user explicitly requires eight valida
 | Correct | 1849 | 10 sports car | 10 sports car |
 | Incorrect | 239 | 11 mountain bike | 19 strawberry |
 | Incorrect | 791 | 2 red fox | 1 timber wolf |
-| Incorrect | 1323 | 9 fire engine | 14 steam locomotive |
+| Incorrect | 1318 | 10 sports car | 14 steam locomotive |
 | Incorrect | 1848 | 18 teapot | 17 laptop |
 
-The local eight-panel figure is `runs/q4_lame_view8/q4_examples.png` (SHA-256 `840438671836e80aeb78aee46c357626fc641dff35ff17b0c9add3c8281ea63d`). The figure should be embedded in the report PDF, not submitted as separate validation images.
+The local eight-panel figure is `runs/q4_lame_view8_k10/q4_examples.png` (SHA-256 `e72f017a724fafdacb823b33bcbcda15147fec21aacd9a1c1baf060263c0bab1`). The figure should be embedded in the report PDF, not submitted as separate validation images.

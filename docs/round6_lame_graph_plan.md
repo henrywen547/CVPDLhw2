@@ -44,3 +44,5 @@ All runs used code commit `e4a3478`, seed 0, diagnostics off, on the local GTX 1
 ```
 
 It took **87.5 s / 848 MiB** locally, the same as `lame_view8`, since graph density costs nothing measurable. The verified upload copy is `runs/final_lame_view8_k10/submission.csv` (SHA-256 `98c48cb5b4001f0f810d04ae13f4402d6b68c36265a688cba21516667bf8df15`, matching its log); the reproduction snapshot is in `runs/lame_view8_k10_candidate/`. Against `lame_view8`, **1068/12,288 (8.7%)** test predictions differ, versus 98/2112 (4.6%) on validation, so the denser graph changes the test stream more. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8` until the user's feedback.
+
+The user subsequently reported **public 0.87483** for this file, versus 0.81835 for `lame_view8`. The gain is **+0.05648**, and the score now exceeds the 0.84 strong baseline. Unlike the view-count change in round 5, most of the validation gain transferred to public. `lame_view8_k10` is now selected for the root `submission.csv`, `runs/submission_staging/`, and the Q4 figure (`runs/q4_lame_view8_k10/`). Private accuracy and RTX 3090 runtime remain unmeasured.
