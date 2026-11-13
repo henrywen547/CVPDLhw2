@@ -126,3 +126,7 @@ At commit `e4a3478`, three predeclared graph variants of `lame_view8` were compa
 ## Round 7: neighbor count beyond ten
 
 At commit `7010ae4`, the same-commit k = 10 control reproduced 1901/2112 exactly. k = 15, 20, and 30 scored 1967, **1987 (.940814)**, and 1974, all at 15.4 s / 848 MiB on validation, so validation peaks near k = 20. `lame_view8_k20` received the single full test pass (**87.5 s / 848 MiB** locally). The verified upload copy is `runs/final_lame_view8_k20/submission.csv` (SHA-256 `062625d7…4697f`). The user reported **public 0.87906** (+0.00423 over k = 10), so `lame_view8_k20` is now the selected method. Details: [round7_lame_k_plan.md](round7_lame_k_plan.md).
+
+## Round 8: robust BN statistics
+
+At commit `bf99b69`, k = 20 LAME with custom BN statistics: an α = 1 equivalence check reproduced 1987/2112. Source-mixed α = 0.9 / 0.7 scored 1995 / 2011; per-view EMA momentum 0.3 / 0.1 scored **2019 (.955966)** / 1962. All custom-BN runs took 16.1 s on validation versus 15.3 s, above the predeclared 15.6 s guard, so no test pass was run. Details and speed probes: [round8_robust_bn_plan.md](round8_robust_bn_plan.md).

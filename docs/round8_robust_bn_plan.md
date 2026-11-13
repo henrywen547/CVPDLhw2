@@ -32,4 +32,20 @@ Synthetic checks on a random ResNet-18 confirmed: α = 1 mix matches native curr
 
 ## Results
 
-Pending.
+All runs used code commit `bf99b69`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `lame_view8_k20` (control) | 1987 | .940814 | — | 15.3 | 848 |
+| `lame8k20_mix10` (equivalence check) | 1987 | .940814 | 0 | 16.1 | 848 |
+| `lame8k20_mix09` | 1995 | .944602 | +8 | 16.1 | 848 |
+| `lame8k20_mix07` | 2011 | .952178 | +24 | 16.1 | 848 |
+| `lame8k20_ema03` | **2019** | **.955966** | **+32** | 16.1 | 848 |
+| `lame8k20_ema01` | 1962 | .928977 | −25 | 16.1 | 848 |
+
+- The α = 1 custom module reproduced the control's accuracy, confirming the implementation; its cost is **+0.8 s** on validation (≈ +4.6 s on the full test, estimated ≈ 92 s locally).
+- `ema03` and `mix07` qualify on accuracy. `ema01` (slow EMA) hurts, presumably because it lags behind domain changes.
+- **No test pass was run**: all custom-BN variants exceed the predeclared 15.6 s validation-time guard.
+- Speed probes on one 64-image ResNet-50 forward: native current-batch BN 54.4 ms versus custom EMA 57.4 ms. Fusing the small EMA arithmetic (`torch._foreach_lerp_`) saved only 0.3 ms, and `cudnn.benchmark` saved nothing. The overhead comes from the two-pass `var_mean` + inference-BN kernels versus cuDNN's single training-mode kernel, not from the small ops. Both probes were reverted.
+
+Next decision (user): accept a ≈ 92 s local estimate for `ema03` on the grounds that the grading RTX 3090 is faster but unmeasured, or first recover time in a separately predeclared round.
