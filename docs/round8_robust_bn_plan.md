@@ -55,3 +55,5 @@ The user chose to accept a modest local overrun to obtain a public score. The us
 ```
 
 It took **91.6 s** (1.6 s above 90 s on this GPU) and **848 MiB** locally. The verified upload copy is `runs/final_lame8k20_ema03/submission.csv` (SHA-256 `195be44f8e8b27d5247483d0bf001732348d9e47d15c849b44373856477e69cf`, matching its log); the reproduction snapshot is in `runs/lame8k20_ema03_candidate/`. Against k = 20 with native BN, **970/12,288 (7.9%)** test predictions differ, versus 74/2112 (3.5%) on validation. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8_k20`. RTX 3090 runtime remains unmeasured.
+
+The user subsequently reported **public 0.89143** (rank 57/79) for this file, versus 0.87906 for k = 20 with native BN. The gain is **+0.01237**, and the score now exceeds the grading mean μ = 0.890748. `lame8k20_ema03` is now selected for the root `submission.csv`, staged COOL files, and Q4 figure (`runs/q4_lame8k20_ema03/`). The local test time of 91.6 s on the GTX 1080 Ti is a known risk; the RTX 3090 rerun is expected to be faster but is unmeasured.

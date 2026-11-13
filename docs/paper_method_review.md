@@ -32,6 +32,6 @@ Boudiaf et al., *Parameter-free Online Test-time Adaptation*, CVPR 2022 ([paper]
 3. The affinity is a symmetric cosine k-nearest-neighbor graph with negative similarities clamped to zero (k = 5 up to round 5; k = 10 in round 6; the selected `lame_view8_k20` uses k = 20).
 4. Exactly ten update iterations are run instead of iterating to convergence.
 
-All results are therefore reported as **LAME-inspired**. LAME and COME are the Q1 papers; GOLD remains documented here only for the `gold_sf` ablation.
+All results are therefore reported as **LAME-inspired**. The selected `lame8k20_ema03` also replaces difference 1 with per-view exponential moving averages of batch BN statistics (momentum 0.3, initialized from each view's first served batch; `starter/robust_bn.py`). This is an independently written variant of the robust BN idea in RoTTA (Yuan et al., *Robust Test-Time Adaptation in Dynamic Scenarios*, CVPR 2023; [author code](https://github.com/BIT-DA/RoTTA)). RoTTA's memory bank, teacher-student training, and reweighting are not used. LAME and COME are the Q1 papers; GOLD remains documented here only for the `gold_sf` ablation.
 
 No paper repository's data download, checkpoint loader, or benchmark runner was executed.
