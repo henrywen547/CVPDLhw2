@@ -48,4 +48,10 @@ All runs used code commit `bf99b69`, seed 0, diagnostics off, on the local GTX 1
 - **No test pass was run**: all custom-BN variants exceed the predeclared 15.6 s validation-time guard.
 - Speed probes on one 64-image ResNet-50 forward: native current-batch BN 54.4 ms versus custom EMA 57.4 ms. Fusing the small EMA arithmetic (`torch._foreach_lerp_`) saved only 0.3 ms, and `cudnn.benchmark` saved nothing. The overhead comes from the two-pass `var_mean` + inference-BN kernels versus cuDNN's single training-mode kernel, not from the small ops. Both probes were reverted.
 
-Next decision (user): accept a ≈ 92 s local estimate for `ema03` on the grounds that the grading RTX 3090 is faster but unmeasured, or first recover time in a separately predeclared round.
+The user chose to accept a modest local overrun to obtain a public score. The user's reasoning: the RTX 3090 is faster than the GTX 1080 Ti, so a slight local excess should be acceptable as long as it is not severe. `lame8k20_ema03` then received one full test pass at the same commit:
+
+```bash
+../../.venv/bin/python run.py --method lame8k20_ema03 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame8k20_ema03 --seed 0
+```
+
+It took **91.6 s** (1.6 s above 90 s on this GPU) and **848 MiB** locally. The verified upload copy is `runs/final_lame8k20_ema03/submission.csv` (SHA-256 `195be44f8e8b27d5247483d0bf001732348d9e47d15c849b44373856477e69cf`, matching its log); the reproduction snapshot is in `runs/lame8k20_ema03_candidate/`. Against k = 20 with native BN, **970/12,288 (7.9%)** test predictions differ, versus 74/2112 (3.5%) on validation. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8_k20`. RTX 3090 runtime remains unmeasured.
