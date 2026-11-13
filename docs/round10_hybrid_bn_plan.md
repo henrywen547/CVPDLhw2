@@ -23,4 +23,13 @@ Official validation harness, supplied checkpoint, seed 0, diagnostics off, one c
 
 ## Results
 
-Pending.
+All runs used code commit `da60dfa`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s |
+| --- | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03` (control) | 2019 | .955966 | — | 16.1 |
+| `lame8k20_ema03_src01` | 2020 | .956439 | +1 | 16.2 |
+| `lame8k20_ema03_src02` | 2018 | .955492 | −1 | 16.2 |
+| `lame8k20_ema03_src03` | 2017 | .955019 | −2 | 16.2 |
+
+All differences are within ±2 images, so no candidate qualifies and **no test pass** was run. The source prior that helped native current-batch BN (+24 in round 8) adds nothing once per-view EMA is used, so the EMA appears to already capture that benefit. The selected method stays `lame8k20_ema03`. Together with round 9, this suggests the BN-statistics component is also saturated on validation.

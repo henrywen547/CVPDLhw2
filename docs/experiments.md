@@ -134,3 +134,7 @@ At commit `bf99b69`, k = 20 LAME with custom BN statistics: an α = 1 equivalenc
 ## Round 9: EMA momentum and k around the selected method
 
 At commit `4f87d05`, the control `lame8k20_ema03` reproduced 2019/2112. Momentum 0.2 also scored 2019. Momentum 0.5, k = 15, and k = 30 (each with EMA 0.3) scored 2005, 2007, and 2005. No candidate met the ≥10-image rule, so no test pass was run and the selected method is unchanged. Details: [round9_ema_tuning_plan.md](round9_ema_tuning_plan.md).
+
+## Round 10: hybrid EMA + source-prior BN
+
+At commit `da60dfa`, blending 10%, 20%, or 30% source statistics into the per-view EMA normalization scored 2020, 2018, and 2017, against the control's 2019. All are within noise, so no test pass was run and the selected method is unchanged. Details: [round10_hybrid_bn_plan.md](round10_hybrid_bn_plan.md).
