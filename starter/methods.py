@@ -16,7 +16,8 @@ from diagnostics import SourceDiagnostics
 from gold_source_free import GoldSourceFree
 from unmix_tns import UnMixStream
 from lame_output import (LameCurrentBatch, LameFourView, LameSixView, LameEightView,
-                         LameEightViewK3, LameEightViewK10, LameEightViewMemory)
+                         LameEightViewK3, LameEightViewK10, LameEightViewK15,
+                         LameEightViewK20, LameEightViewK30, LameEightViewMemory)
 
 
 class Source:
@@ -280,7 +281,9 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "unmix": UnMixStream, "lame_bn": LameCurrentBatch,
            "lame_view4": LameFourView, "lame_view6": LameSixView,
            "lame_view8": LameEightView, "lame_view8_k3": LameEightViewK3,
-           "lame_view8_k10": LameEightViewK10, "lame_view8_mem": LameEightViewMemory,
+           "lame_view8_k10": LameEightViewK10, "lame_view8_k15": LameEightViewK15,
+           "lame_view8_k20": LameEightViewK20, "lame_view8_k30": LameEightViewK30,
+           "lame_view8_mem": LameEightViewMemory,
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,

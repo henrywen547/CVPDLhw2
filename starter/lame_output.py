@@ -133,6 +133,18 @@ class LameEightViewK10(LameEightView):
     neighbors = 10
 
 
+class LameEightViewK15(LameEightView):
+    neighbors = 15
+
+
+class LameEightViewK20(LameEightView):
+    neighbors = 20
+
+
+class LameEightViewK30(LameEightView):
+    neighbors = 30
+
+
 class LameEightViewMemory(LameEightView):
     """Previous served batch as fixed graph nodes; one batch of memory."""
 
