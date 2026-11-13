@@ -69,6 +69,7 @@ def main():
                      f"{item['truth']} {classes[item['truth']]} |")
 
     paper_sources = (
+        ("LAME_CVPR2022.pdf", "https://openaccess.thecvf.com/content/CVPR2022/papers/Boudiaf_Parameter-Free_Online_Test-Time_Adaptation_CVPR_2022_paper.pdf"),
         ("COME_ICLR2025.pdf", "https://proceedings.iclr.cc/paper_files/paper/2025/file/2ea18fdc667e0ef2ad82b2b4d65147ad-Paper-Conference.pdf"),
         ("GOLD_CVPR2026.pdf", "https://arxiv.org/pdf/2603.21928"),
     )
@@ -94,20 +95,20 @@ def main():
         "- `round3_plan.md`: public feedback, bounded multiview experiments, and resource checks.",
         "- `round4_unmix_plan.md`: UnMix-TNS normalization-only test and negative result.",
         "- `round4_lame_plan.md`: LAME-inspired graph output correction and validation result.",
-        "- `round5_view_sensitivity.md`: bounded four/eight-view comparison and test candidate.",
+        "- `round5_view_sensitivity.md`: bounded four/eight-view comparison and selected eight-view method.",
         "- `data_exploration.md`: validation diagnostics and permutation results.",
         "- `q4_procedure.md`: exact validation-only selection procedure.",
         "- `q4_examples.png`: ready-to-insert eight-panel Q4 figure.",
         "- `q4_examples.json`: selected IDs, positions, predicted and true indices.",
         "- `q4_individual_images/`: the same eight original validation PNGs for custom layout.",
-        "- `papers/`: original COME and GOLD PDFs for offline Q1 reading (when downloaded).",
+        "- `papers/`: original LAME and COME PDFs (Q1 papers) plus GOLD (`gold_sf` ablation only), when downloaded.",
         "",
         "## Q1 papers",
         "",
         *papers,
         "",
         f"Q4 figure SHA-256: `{sha256(args.q4_figure)}`.",
-        f"Official Tent validation prediction CSV SHA-256: `{metadata['prediction_sha256']}`.",
+        f"Official validation prediction CSV used for Q4 SHA-256: `{metadata['prediction_sha256']}`.",
         "",
         "## Q4 images",
         "",

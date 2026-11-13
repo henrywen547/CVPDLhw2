@@ -67,9 +67,9 @@ The ten-view paired candidate reached **1763/2112 (.834754)** on official valida
 
 The [LAME-inspired round](docs/round4_lame_plan.md) tested parameter-free current-batch output correction on one-view BN and six-view BN. `lame_view6` reached **1772/2112 (.839015)** in 11.7 seconds and 808 MiB on official validation.
 
-Its official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. The user reported **public 0.81266**. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); the root `submission.csv` and `runs/submission_staging/` now correspond to this method.
+Its official full test completed in **66.2 seconds** and **808 MiB** on the GTX 1080 Ti. The user reported **public 0.81266**. Its log-verified Kaggle file is `runs/final_lame_view6/submission.csv` (SHA-256 `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`); it is preserved as an earlier candidate.
 
-A [bounded view-count check](docs/round5_view_sensitivity.md) found an eight-view LAME-inspired candidate at **1827/2112 (.865057)** validation, compared with 1772/2112 for the current six-view version. Its separate full local test took **87.5 seconds / 848 MiB**. The verified upload file is `runs/final_lame_view8/submission.csv`; public score is pending. The root submission remains the six-view method until public feedback supports changing it.
+A [bounded view-count check](docs/round5_view_sensitivity.md) found an eight-view LAME-inspired candidate at **1827/2112 (.865057)** validation, compared with 1772/2112 for six views. Its separate full local test took **87.5 seconds / 848 MiB**. The user reported **public 0.81835** for `runs/final_lame_view8/submission.csv`, above the six-view 0.81266, so `lame_view8` is now the selected method: the root `submission.csv`, `runs/submission_staging/`, and the Q4 report figure correspond to it.
 
 ## Official test artifacts and current submission
 
@@ -105,15 +105,23 @@ The earlier `bn_view8` artifact was run from `CVPDLhw2/starter` at commit `57c20
 
 It scored **1722/2112 (.815341)** on validation and completed the full local test in **87.3 seconds**, 706 MiB. Its paired official files are in `runs/final_bn_view8/`; the CSV SHA-256 is `9460c10feeebae78946484bbea9ad28fc43731aebdbe07059c7bb796930d8330`. The user reported public **0.76822**. These earlier files remain preserved.
 
-The current `lame_view6` artifact was run from `CVPDLhw2/starter` at commit `c6d18e32b6206abb2a021797e64dc013b3579dcc`:
+The earlier `lame_view6` artifact was run from `CVPDLhw2/starter` at commit `c6d18e32b6206abb2a021797e64dc013b3579dcc`:
 
 ```bash
 ../../.venv/bin/python run.py --method lame_view6 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view6 --seed 0
 ```
 
-It scored **1772/2112 (.839015)** on validation and **public 0.81266** as reported by the user. The full local test took **66.2 seconds** and **808 MiB** peak VRAM. Its paired official CSV/log hash is `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`. RTX 3090 runtime and private accuracy remain unmeasured.
+It scored **1772/2112 (.839015)** on validation and **public 0.81266** as reported by the user. The full local test took **66.2 seconds** and **808 MiB** peak VRAM. Its paired official CSV/log hash is `b60a57c286eb1eab643b3ac880f6e9a764495aeb5110f7cfb85525273a238398`. These files remain preserved.
 
-To regenerate the Kaggle upload filename from the current `lame_view6` official run, without rerunning the test stream, run from the repository root:
+The current **`lame_view8`** artifact was run from `CVPDLhw2/starter` at commit `902672e5812783ea917af4e0a5e3b55d4ac87a68`:
+
+```bash
+../../.venv/bin/python run.py --method lame_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8 --seed 0
+```
+
+It scored **1827/2112 (.865057)** on validation and **public 0.81835** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti, only 2.5 seconds under the 90-second limit on this GPU. Its paired official CSV/log hash is `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`. RTX 3090 runtime and private accuracy remain unmeasured.
+
+To regenerate the Kaggle upload filename from the current `lame_view8` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -122,10 +130,10 @@ To regenerate the Kaggle upload filename from the current `lame_view6` official 
 The script verifies the paired run-log hash, `id,label` header, 12,288 unique IDs, and label range, then copies the exact CSV bytes to `submission.csv`. Use `--pred`, `--run-log`, and `--out` to select another official run or destination. See [docs/experiments.md](docs/experiments.md) for the full record and remaining submission items.
 
 The Q4 report-only validation-image procedure is documented in [docs/q4_procedure.md](docs/q4_procedure.md). It is separate from the official adaptation and test code. Report source files and the Q4 figure are collected under `runs/report_materials/`; the PDF is left for the user to compose.
-The same local folder also contains the original COME and GOLD paper PDFs for offline Q1 reading; their links and checksums are in its `README.md`.
+The same local folder also contains the original paper PDFs for offline Q1 reading (LAME and COME are the Q1 papers; GOLD is kept for the `gold_sf` ablation); their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame_view6/q4_examples.png --q4-metadata runs/q4_lame_view6/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame_view8/q4_examples.png --q4-metadata runs/q4_lame_view8/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules

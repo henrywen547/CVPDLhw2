@@ -107,4 +107,14 @@ The eight-view method received one official full test pass from `CVPDLhw2/starte
 ../../.venv/bin/python run.py --method lame_view8 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8 --seed 0
 ```
 
-The 12,288-image local GTX 1080 Ti pass took **87.5 seconds / 848 MiB**. The paired official CSV/log and verified upload copy `runs/final_lame_view8/submission.csv` have SHA-256 `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`. This is an independent candidate; the root `submission.csv` remains the user-tested six-view method. The eight-view public/private scores and grading RTX 3090 runtime are unmeasured.
+The 12,288-image local GTX 1080 Ti pass took **87.5 seconds / 848 MiB**. The paired official CSV/log and verified upload copy `runs/final_lame_view8/submission.csv` have SHA-256 `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`. This was first kept as an independent candidate while the root `submission.csv` remained the user-tested six-view method.
+
+### Selected eight-view artifact
+
+The user reported **public 0.81835** for `runs/final_lame_view8/submission.csv`, versus **0.81266** for six views. The public gain (0.00569) is much smaller than the validation gain (55 images, 2.6 points). The method remains 0.02165 below the 0.84 strong baseline. `lame_view8` is now the selected method:
+
+- `scripts/make_submission.py` defaults to `runs/final_lame_view8/test_pred.csv`. The root `submission.csv` was regenerated and verified against the paired log (SHA-256 `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`).
+- `runs/submission_staging/` holds the eight-view `test_pred.csv`, `test_run_log.json`, `Readme.md`, and a `code/` snapshot identical to `starter/`, with the original `harness.py`.
+- The Q4 figure was rebuilt from the official `lame_view8` validation predictions (`runs/q4_lame_view8/`).
+
+The six-view and all earlier artifacts remain preserved. Private accuracy and grading RTX 3090 runtime are unmeasured; the local full stream is only 2.5 seconds under 90 seconds on the GTX 1080 Ti.

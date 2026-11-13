@@ -3,7 +3,7 @@ Frozen source,1152,2112,0.5454545455,0.0000,2.7,706,"eval; no adaptation",0b26fb
 Current-batch BN statistics only,1526,2112,0.7225378788,17.7083,2.6,706,"current batch BN; no parameter update",b013fe81faa444b9065936e224ae89a29a175828,runs/bn_batch/val_run_log.json
 Tent,1528,2112,0.7234848485,17.8030,5.2,3470,"BN affine SGD; lr 0.001; momentum 0.9; one step per batch",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/tent_lr001/val_run_log.json
 Tent LR 0.0003,1526,2112,0.7225378788,17.7083,5.1,3470,"same Tent; lr 0.0003; momentum 0.9",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_0003/val_run_log.json
-Tent LR 0.003,1530,2112,0.7244318182,17.8977,5.1,3470,"same Tent; lr 0.003; momentum 0.9; selected for current test CSV",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_003/val_run_log.json
+Tent LR 0.003,1530,2112,0.7244318182,17.8977,5.1,3470,"same Tent; lr 0.003; momentum 0.9; earlier test CSV; public 0.72005",96d5b578119115f78e9ac2fcbb632d5ad4657fb2,runs/round2_tent_003/val_run_log.json
 Tent+COME,1526,2112,0.7225378788,17.7083,5.3,3470,"same as Tent; opinion entropy K 1000",b6f2a6d886259421a1a53089dbfcc838f35f0083,runs/come_lr001/val_run_log.json
 Tent gate 0.4,1528,2112,0.7234848485,17.8030,5.2,3470,"custom predicted-class concentration gate; inactive 33/33 updates",f3edf49af806057b8367bd0a5760b92022961cd8,runs/tent_gate_040/val_run_log.json
 Tent gate 0.25,1528,2112,0.7234848485,17.8030,5.0,3370,"custom predicted-class concentration gate; 31/33 updates",0197bb0567388a83b2faffb4a57c032fb175fb2e,runs/tent_gate_025_timed/val_run_log.json
@@ -13,13 +13,13 @@ Tent current-batch post-update,1530,2112,0.7244318182,17.8977,7.0,3470,"Tent lr 
 BN three-view,1604,2112,0.7594696970,21.4015,6.2,706,"original; flip; 90 percent center zoom",ad5c208561ca3e6988d8412215b19e13026d2947,runs/round3_bn_flip_zoom/val_run_log.json
 BN four-view,1617,2112,0.7656250000,22.0170,8.0,706,"original+flip; 90 percent center zoom+flip",252388e6ecea23c14b73dbb94edbc89add67a7c1,runs/round3_bn_view4/val_run_log.json
 BN six-view,1682,2112,0.7964015152,25.0947,11.7,706,"four views plus 80 percent center zoom+flip",252388e6ecea23c14b73dbb94edbc89add67a7c1,runs/round3_bn_view6/val_run_log.json
-BN eight-view,1722,2112,0.8153409091,26.9886,15.3,706,"six views plus 70 percent center zoom+flip",dc3ce7ccaa5fb0215baf710cade7e9d619f822da,runs/round3_bn_view8/val_run_log.json
+BN eight-view,1722,2112,0.8153409091,26.9886,15.3,706,"six views plus 70 percent center zoom+flip; earlier test CSV; public 0.76822",dc3ce7ccaa5fb0215baf710cade7e9d619f822da,runs/round3_bn_view8/val_run_log.json
 BN ten-view sequential,1759,2112,0.8328598485,28.7405,18.9,706,"eight views plus 60 percent center zoom+flip",dc3ce7ccaa5fb0215baf710cade7e9d619f822da,runs/round3_bn_view10/val_run_log.json
-BN ten-view paired,1763,2112,0.8347537879,28.9299,19.0,1164,"five 128-view forwards; paired BN; probability fusion; selected test candidate",a20d1ea21d305d01ad966cc40e067d48991d326b,runs/round3_bn_view10_pair/val_run_log.json
+BN ten-view paired,1763,2112,0.8347537879,28.9299,19.0,1164,"five 128-view forwards; paired BN; probability fusion; earlier test CSV; public 0.76627",a20d1ea21d305d01ad966cc40e067d48991d326b,runs/round3_bn_view10_pair/val_run_log.json
 BN ten-view paired logits,1751,2112,0.8290719697,28.3617,19.0,1164,"same views; raw-logit fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_pair_logits/val_run_log.json
 BN ten-view all-at-once,1754,2112,0.8304924242,28.5038,19.9,4674,"same views; one pooled-BN forward; probability fusion",f0dc2fecb722bdf29b2264eedcb857c56efe42bd,runs/round3_bn_view10_all/val_run_log.json
 UnMix-TNS normalization-only,1413,2112,0.6690340909,12.3580,3.9,912,"source-statistics-initialized K16 online UnMix BN; no optimizer or multiview",a18327c3f8ea80999775b2c7b5cb81345264b0b9,runs/round4_unmix_single/val_run_log.json
 LAME-inspired one-view BN,1594,2112,0.7547348485,20.9280,2.7,706,"current-batch BN; cosine five-neighbor output graph; ten updates",06a95fc04d8de1d80a50183438c663773a058d65,runs/round4_lame_bn/val_run_log.json
-LAME-inspired six-view BN,1772,2112,0.8390151515,29.3561,11.7,808,"six-view BN; averaged features and probabilities; cosine five-neighbor output graph",06a95fc04d8de1d80a50183438c663773a058d65,runs/round4_lame_view6/val_run_log.json
+LAME-inspired six-view BN,1772,2112,0.8390151515,29.3561,11.7,808,"six-view BN; averaged features and probabilities; cosine five-neighbor output graph; public 0.81266",06a95fc04d8de1d80a50183438c663773a058d65,runs/round4_lame_view6/val_run_log.json
 LAME-inspired four-view BN,1704,2112,0.8068181818,26.1364,8.1,768,"four-view BN; same graph and output updates; stopped after validation",902672e5812783ea917af4e0a5e3b55d4ac87a68,runs/round5_lame_view4/val_run_log.json
-LAME-inspired eight-view BN,1827,2112,0.8650568182,31.9602,15.3,848,"eight-view BN; same graph and output updates; separate test candidate",902672e5812783ea917af4e0a5e3b55d4ac87a68,runs/round5_lame_view8/val_run_log.json
+LAME-inspired eight-view BN,1827,2112,0.8650568182,31.9602,15.3,848,"eight-view BN; same graph and output updates; selected test CSV; public 0.81835",902672e5812783ea917af4e0a5e3b55d4ac87a68,runs/round5_lame_view8/val_run_log.json

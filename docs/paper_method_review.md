@@ -21,4 +21,17 @@ The [released classification implementation](https://raw.githubusercontent.com/A
 
 The local `gold_sf` ablation follows that limited path. For ResNet-50's 20×2048 classifier weight matrix `W`, it starts with the top eight eigenvectors of `WᵀW`. For each current batch it predicts with a trainable eight-value scaling vector in this subspace, makes one entropy-minimizing SGD update to that vector, and forms the exact classifier-gradient outer product for selected confident predictions: each top-logit feature gradient is the corresponding row of the fixed `W`. Exponential averaging of the 20 class proportions (alpha 0.1) updates the subspace through a 20×20 Gram eigendecomposition. This is algebraically equivalent to updating a `Wᵀ diag(coefficients) W` matrix while avoiding a 2048×2048 eigendecomposition. The backbone is frozen; BN uses only current-batch statistics. The source prototypes, teacher, augmented view, source warm-up, and contrastive losses in released GOLD are **omitted**. The replacement objective is ordinary prediction entropy. It therefore tests only whether a source-free online classifier-sensitive subspace helps this assignment.
 
+## LAME (selected method's source paper)
+
+Boudiaf et al., *Parameter-free Online Test-time Adaptation*, CVPR 2022 ([paper](https://openaccess.thecvf.com/content/CVPR2022/html/Boudiaf_Parameter-Free_Online_Test-Time_Adaptation_CVPR_2022_paper.html), [author code](https://github.com/fiveai/LAME)). The paper freezes the source model and minimizes `Σ KL(z_i‖q_i) − Σ w_ij z_iᵀz_j` over the current batch's assignments. Its concave-convex update `z_ik ∝ q_ik exp(Σ_j w_ij z_jk)` is iterated to convergence; the affinity function is the only hyperparameter. It uses only the current batch and needs no source data, no extra weights, and no gradients, so it is compatible with the HW2 rules as an output-only method.
+
+`starter/lame_output.py` is written independently from the paper's equations; no author code was copied or executed. Local differences:
+
+1. BatchNorm uses current-view batch statistics (running statistics disabled) instead of the frozen source statistics.
+2. Probabilities and average-pool features are averaged over 1, 4, 6, or 8 test-time views before correction.
+3. The affinity is a symmetric cosine five-nearest-neighbor graph with negative similarities clamped to zero.
+4. Exactly ten update iterations are run instead of iterating to convergence.
+
+All results are therefore reported as **LAME-inspired**. LAME and COME are the Q1 papers; GOLD remains documented here only for the `gold_sf` ablation.
+
 No paper repository's data download, checkpoint loader, or benchmark runner was executed.
