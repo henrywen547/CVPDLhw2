@@ -122,3 +122,7 @@ The six-view and all earlier artifacts remain preserved. Private accuracy and gr
 ## Round 6: LAME graph variants at fixed eight-view cost
 
 At commit `e4a3478`, three predeclared graph variants of `lame_view8` were compared with a same-commit control (1827/2112, identical predictions to round 5). `lame_view8_k3` scored 1779, `lame_view8_k10` scored **1901/2112 (.900095)**, and the previous-batch fixed-memory variant `lame_view8_mem` scored 1769. All took 15.3–15.4 s / 848 MiB on validation. Only `k10` met the ≥10-image gain rule. Its one full test pass took **87.5 s / 848 MiB** locally, and its verified upload copy is `runs/final_lame_view8_k10/submission.csv` (SHA-256 `98c48cb5…8df15`). The user reported **public 0.87483** (+0.05648 over `lame_view8`), so `lame_view8_k10` is now the selected method for the root `submission.csv`, staged COOL files, and Q4 figure. Details: [round6_lame_graph_plan.md](round6_lame_graph_plan.md).
+
+## Round 7: neighbor count beyond ten
+
+At commit `7010ae4`, the same-commit k = 10 control reproduced 1901/2112 exactly. k = 15, 20, and 30 scored 1967, **1987 (.940814)**, and 1974, all at 15.4 s / 848 MiB on validation, so validation peaks near k = 20. `lame_view8_k20` received the single full test pass (**87.5 s / 848 MiB** locally). The verified upload copy is `runs/final_lame_view8_k20/submission.csv` (SHA-256 `062625d7…4697f`). Public score is pending, and the root submission remains `lame_view8_k10`. Details: [round7_lame_k_plan.md](round7_lame_k_plan.md).

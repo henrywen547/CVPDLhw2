@@ -24,4 +24,19 @@ Everything else is unchanged: eight views, cosine similarity with negative value
 
 ## Results
 
-Pending.
+All runs used code commit `7010ae4`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. k = 10 control | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `lame_view8_k10` (control) | 1901 | .900095 | — (identical predictions to round 6) | 15.3 | 848 |
+| `lame_view8_k15` | 1967 | .931345 | +66 | 15.4 | 848 |
+| `lame_view8_k20` | **1987** | **.940814** | **+86** | 15.4 | 848 |
+| `lame_view8_k30` | 1974 | .934659 | +73 | 15.4 | 848 |
+
+Validation peaks near k = 20 and declines at k = 30. All three variants qualify; following the rule, only the best (`k20`) received the round's single full test pass:
+
+```bash
+../../.venv/bin/python run.py --method lame_view8_k20 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8_k20 --seed 0
+```
+
+It took **87.5 s / 848 MiB** locally. The verified upload copy is `runs/final_lame_view8_k20/submission.csv` (SHA-256 `062625d79f05c638bc92bda13956e10af2ea5dd22307eb5a0358dd37bc24697f`, matching its log); the reproduction snapshot is in `runs/lame_view8_k20_candidate/`. Against k = 10, **1468/12,288 (11.9%)** test predictions differ, versus 141/2112 (6.7%) on validation. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8_k10`.
