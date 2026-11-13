@@ -30,11 +30,41 @@ def adjust_outputs(probability, features, *, neighbors=5, steps=10):
     return assignment
 
 
+def adjust_outputs_with_memory(probability, features, memory_features,
+                               memory_assignment, *, neighbors=5, steps=10):
+    """Same update, with fixed nodes from the previous served batch.
+
+    Memory nodes are already-returned outputs of the previous batch. They are
+    candidate neighbors for current samples but are never updated, so earlier
+    predictions cannot change.
+    """
+    count = len(probability)
+    if count < 2:
+        return probability
+    feature = F.normalize(features, dim=1)
+    memory = F.normalize(memory_features, dim=1)
+    similarity = feature @ torch.cat((feature, memory)).T
+    similarity[:, :count].fill_diagonal_(-1)
+    values, indices = similarity.topk(min(neighbors, similarity.shape[1] - 1), dim=1)
+    affinity = torch.zeros_like(similarity)
+    affinity.scatter_(1, indices, values.clamp_min(0))
+    current = (affinity[:, :count] + affinity[:, :count].T) * 0.5
+    memory_message = affinity[:, count:] @ memory_assignment
+
+    log_prior = probability.clamp_min(1e-12).log()
+    assignment = probability
+    for _ in range(steps):
+        assignment = (log_prior + current @ assignment + memory_message).softmax(dim=1)
+    return assignment
+
+
 class LameCurrentBatch:
     """Current-batch BN predictions corrected by a feature affinity graph."""
 
     crop_borders = ()
     include_flip = False
+    neighbors = 5
+    use_memory = False
 
     def __init__(self, model):
         self.model = model.eval()
@@ -44,6 +74,7 @@ class LameCurrentBatch:
                 module.running_mean = None
                 module.running_var = None
         self.feature = None
+        self.memory = None
         self.model.avgpool.register_forward_hook(self._capture_feature)
 
     def _capture_feature(self, _module, _inputs, output):
@@ -68,7 +99,14 @@ class LameCurrentBatch:
             feature_sum = self.feature if feature_sum is None else feature_sum + self.feature
         self.feature = None
         probability = probability / len(views)
-        refined = adjust_outputs(probability, feature_sum / len(views))
+        feature = feature_sum / len(views)
+        if self.use_memory and self.memory is not None:
+            refined = adjust_outputs_with_memory(probability, feature, *self.memory,
+                                                 neighbors=self.neighbors)
+        else:
+            refined = adjust_outputs(probability, feature, neighbors=self.neighbors)
+        if self.use_memory:
+            self.memory = (feature, refined)
         return refined.argmax(dim=1)
 
 
@@ -85,3 +123,17 @@ class LameFourView(LameCurrentBatch):
 class LameEightView(LameCurrentBatch):
     crop_borders = (8, 16, 24)
     include_flip = True
+
+
+class LameEightViewK3(LameEightView):
+    neighbors = 3
+
+
+class LameEightViewK10(LameEightView):
+    neighbors = 10
+
+
+class LameEightViewMemory(LameEightView):
+    """Previous served batch as fixed graph nodes; one batch of memory."""
+
+    use_memory = True
