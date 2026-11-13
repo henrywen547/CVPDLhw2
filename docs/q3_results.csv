@@ -29,7 +29,7 @@ LAME-inspired eight-view previous-batch memory,1769,2112,0.8375946970,29.2140,15
 LAME-inspired eight-view k15,1967,2112,0.9313446970,38.5890,15.4,848,"eight-view BN; cosine 15-neighbor graph; round 7",7010ae4,runs/round7_lame_view8_k15/val_run_log.json
 LAME-inspired eight-view k20,1987,2112,0.9408143939,39.5360,15.4,848,"eight-view BN; cosine 20-neighbor graph; round 7; selected test CSV; public 0.87906",7010ae4,runs/round7_lame_view8_k20/val_run_log.json
 LAME-inspired eight-view k30,1974,2112,0.9346590909,38.9205,15.4,848,"eight-view BN; cosine 30-neighbor graph; round 7",7010ae4,runs/round7_lame_view8_k30/val_run_log.json
-LAME k20 + source-mixed BN 0.9,1995,2112,0.9446022727,40.0331,16.1,848,"0.9 batch + 0.1 source BN statistics; round 8",bf99b69,runs/round8_lame8k20_mix09/val_run_log.json
+LAME k20 + source-mixed BN 0.9,1995,2112,0.9446022727,39.9148,16.1,848,"0.9 batch + 0.1 source BN statistics; round 8",bf99b69,runs/round8_lame8k20_mix09/val_run_log.json
 LAME k20 + source-mixed BN 0.7,2011,2112,0.9521780303,40.6723,16.1,848,"0.7 batch + 0.3 source BN statistics; round 8",bf99b69,runs/round8_lame8k20_mix07/val_run_log.json
 LAME k20 + per-view EMA BN 0.3,2019,2112,0.9559659091,41.0511,16.1,848,"per-view EMA BN statistics momentum 0.3; round 8; no test pass (time guard)",bf99b69,runs/round8_lame8k20_ema03/val_run_log.json
 LAME k20 + per-view EMA BN 0.1,1962,2112,0.9289772727,38.3523,16.1,848,"per-view EMA BN statistics momentum 0.1; round 8",bf99b69,runs/round8_lame8k20_ema01/val_run_log.json
