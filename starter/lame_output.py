@@ -156,9 +156,11 @@ class LameEightViewK20RobustBN(LameEightViewK20):
 
     bn_mode = "mix"
     bn_alpha = 1.0
+    bn_source = 0.0
 
     def __init__(self, model):
-        self.robust_bn = replace_batchnorm(model, self.bn_mode, self.bn_alpha)
+        self.robust_bn = replace_batchnorm(model, self.bn_mode, self.bn_alpha,
+                                           self.bn_source)
         super().__init__(model)
 
     def _select_view(self, index):
@@ -192,6 +194,18 @@ class LameK20Ema02(LameEightViewK20RobustBN):
 
 class LameK20Ema05(LameEightViewK20RobustBN):
     bn_mode, bn_alpha = "ema", 0.5
+
+
+class LameK20Ema03Src01(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.1
+
+
+class LameK20Ema03Src02(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.2
+
+
+class LameK20Ema03Src03(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.3
 
 
 class LameK15Ema03(LameEightViewK20RobustBN):

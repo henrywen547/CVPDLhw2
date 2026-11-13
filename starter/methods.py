@@ -20,7 +20,8 @@ from lame_output import (LameCurrentBatch, LameFourView, LameSixView, LameEightV
                          LameEightViewK20, LameEightViewK30, LameEightViewMemory,
                          LameK20Mix10, LameK20Mix09, LameK20Mix07, LameK20Ema03,
                          LameK20Ema01, LameK20Ema02, LameK20Ema05, LameK15Ema03,
-                         LameK30Ema03)
+                         LameK30Ema03, LameK20Ema03Src01, LameK20Ema03Src02,
+                         LameK20Ema03Src03)
 
 
 class Source:
@@ -291,7 +292,9 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "lame8k20_mix07": LameK20Mix07, "lame8k20_ema03": LameK20Ema03,
            "lame8k20_ema01": LameK20Ema01, "lame8k20_ema02": LameK20Ema02,
            "lame8k20_ema05": LameK20Ema05, "lame8k15_ema03": LameK15Ema03,
-           "lame8k30_ema03": LameK30Ema03,
+           "lame8k30_ema03": LameK30Ema03, "lame8k20_ema03_src01": LameK20Ema03Src01,
+           "lame8k20_ema03_src02": LameK20Ema03Src02,
+           "lame8k20_ema03_src03": LameK20Ema03Src03,
            "bn_flip": BatchStatsFlip, "bn_flip_zoom": BatchStatsFlipZoom,
            "bn_view4": BatchStatsFourView, "bn_view6": BatchStatsSixView,
            "bn_view8": BatchStatsEightView, "bn_view10": BatchStatsTenView,

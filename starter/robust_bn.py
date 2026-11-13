@@ -8,6 +8,8 @@ Schneider et al., NeurIPS 2020).
 view, initialized from that view's first served batch and updated with
 momentum alpha before normalizing, in the spirit of RoTTA's robust BN
 (Yuan et al., CVPR 2023). It uses only current and previously served batches.
+With `source_weight` s > 0, normalization uses (1 - s) * EMA + s * source
+statistics, while the stored EMA stays a pure average of batch statistics.
 
 Affine weights are the supplied checkpoint's and are never updated.
 """
@@ -18,11 +20,14 @@ import torch.nn.functional as F
 
 
 class RobustBatchNorm2d(nn.Module):
-    def __init__(self, bn, mode, alpha):
+    def __init__(self, bn, mode, alpha, source_weight=0.0):
         super().__init__()
         if mode not in ("mix", "ema"):
             raise ValueError(mode)
         self.mode, self.alpha, self.eps = mode, alpha, bn.eps
+        # `ema` only: blend this share of source statistics into the
+        # normalization; the stored EMA itself stays a pure batch average.
+        self.source_weight = source_weight
         self.register_buffer("source_mean", bn.running_mean.detach().clone())
         self.register_buffer("source_var", bn.running_var.detach().clone())
         self.weight, self.bias = bn.weight, bn.bias
@@ -42,16 +47,20 @@ class RobustBatchNorm2d(nn.Module):
                 mean = (1 - a) * previous[0] + a * mean
                 var = (1 - a) * previous[1] + a * var
             self.state[self.view] = (mean.detach(), var.detach())
+            if self.source_weight:
+                s = self.source_weight
+                mean = (1 - s) * mean + s * self.source_mean
+                var = (1 - s) * var + s * self.source_var
         return F.batch_norm(x, mean, var, self.weight, self.bias, False, 0.0, self.eps)
 
 
-def replace_batchnorm(model, mode, alpha):
+def replace_batchnorm(model, mode, alpha, source_weight=0.0):
     """Swap every BatchNorm2d for RobustBatchNorm2d; return the new modules."""
     replaced = []
     for parent in list(model.modules()):
         for name, child in list(parent.named_children()):
             if isinstance(child, nn.BatchNorm2d):
-                module = RobustBatchNorm2d(child, mode, alpha)
+                module = RobustBatchNorm2d(child, mode, alpha, source_weight)
                 setattr(parent, name, module)
                 replaced.append(module)
     return replaced
