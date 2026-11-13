@@ -71,7 +71,9 @@ Its official full test completed in **66.2 seconds** and **808 MiB** on the GTX 
 
 A [bounded view-count check](docs/round5_view_sensitivity.md) found an eight-view LAME-inspired candidate at **1827/2112 (.865057)** validation, compared with 1772/2112 for six views. Its separate full local test took **87.5 seconds / 848 MiB**. The user reported **public 0.81835** for `runs/final_lame_view8/submission.csv`, above the six-view 0.81266, and it was selected until round 6.
 
-[Round 6](docs/round6_lame_graph_plan.md) kept the eight views and changed only the output graph. `lame_view8_k10` (ten neighbors) scored **1901/2112 (.900095)** validation; three neighbors and a fixed previous-batch memory were negative. The user reported **public 0.87483** for `runs/final_lame_view8_k10/submission.csv`, so `lame_view8_k10` is now the selected method: the root `submission.csv`, `runs/submission_staging/`, and the Q4 report figure correspond to it.
+[Round 6](docs/round6_lame_graph_plan.md) kept the eight views and changed only the output graph. `lame_view8_k10` (ten neighbors) scored **1901/2112 (.900095)** validation; three neighbors and a fixed previous-batch memory were negative. The user reported **public 0.87483** for `runs/final_lame_view8_k10/submission.csv`, and it was selected until round 7.
+
+[Round 7](docs/round7_lame_k_plan.md) raised the neighbor count further: k = 15, 20, 30 scored 1967, **1987 (.940814)**, and 1974 on validation. The user reported **public 0.87906** for `runs/final_lame_view8_k20/submission.csv`, so `lame_view8_k20` is now the selected method: the root `submission.csv`, `runs/submission_staging/`, and the Q4 report figure correspond to it.
 
 ## Official test artifacts and current submission
 
@@ -123,15 +125,23 @@ The earlier `lame_view8` artifact was run from `CVPDLhw2/starter` at commit `902
 
 It scored **1827/2112 (.865057)** on validation and **public 0.81835** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti, only 2.5 seconds under the 90-second limit on this GPU. Its paired official CSV/log hash is `629858e1bbc0fe859fbac45e1846ed841ee9b451b164ef4309e377902ebc9229`. These files remain preserved.
 
-The current **`lame_view8_k10`** artifact was run from `CVPDLhw2/starter` at commit `e4a3478`:
+The earlier `lame_view8_k10` artifact was run from `CVPDLhw2/starter` at commit `e4a3478`:
 
 ```bash
 ../../.venv/bin/python run.py --method lame_view8_k10 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8_k10 --seed 0
 ```
 
-It scored **1901/2112 (.900095)** on validation and **public 0.87483** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti. Its paired official CSV/log hash is `98c48cb5b4001f0f810d04ae13f4402d6b68c36265a688cba21516667bf8df15`. RTX 3090 runtime and private accuracy remain unmeasured.
+It scored **1901/2112 (.900095)** on validation and **public 0.87483** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti. Its paired official CSV/log hash is `98c48cb5b4001f0f810d04ae13f4402d6b68c36265a688cba21516667bf8df15`. These files remain preserved.
 
-To regenerate the Kaggle upload filename from the current `lame_view8_k10` official run, without rerunning the test stream, run from the repository root:
+The current **`lame_view8_k20`** artifact was run from `CVPDLhw2/starter` at commit `7010ae4`:
+
+```bash
+../../.venv/bin/python run.py --method lame_view8_k20 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame_view8_k20 --seed 0
+```
+
+It scored **1987/2112 (.940814)** on validation and **public 0.87906** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti. Its paired official CSV/log hash is `062625d79f05c638bc92bda13956e10af2ea5dd22307eb5a0358dd37bc24697f`. RTX 3090 runtime and private accuracy remain unmeasured.
+
+To regenerate the Kaggle upload filename from the current `lame_view8_k20` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -143,7 +153,7 @@ The Q4 report-only validation-image procedure is documented in [docs/q4_procedur
 The same local folder also contains the original paper PDFs for offline Q1 reading (LAME and COME are the Q1 papers; GOLD is kept for the `gold_sf` ablation); their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame_view8_k10/q4_examples.png --q4-metadata runs/q4_lame_view8_k10/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame_view8_k20/q4_examples.png --q4-metadata runs/q4_lame_view8_k20/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules

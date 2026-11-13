@@ -29,7 +29,7 @@ Boudiaf et al., *Parameter-free Online Test-time Adaptation*, CVPR 2022 ([paper]
 
 1. BatchNorm uses current-view batch statistics (running statistics disabled) instead of the frozen source statistics.
 2. Probabilities and average-pool features are averaged over 1, 4, 6, or 8 test-time views before correction.
-3. The affinity is a symmetric cosine k-nearest-neighbor graph with negative similarities clamped to zero (k = 5 up to round 5; the selected `lame_view8_k10` uses k = 10).
+3. The affinity is a symmetric cosine k-nearest-neighbor graph with negative similarities clamped to zero (k = 5 up to round 5; k = 10 in round 6; the selected `lame_view8_k20` uses k = 20).
 4. Exactly ten update iterations are run instead of iterating to convergence.
 
 All results are therefore reported as **LAME-inspired**. LAME and COME are the Q1 papers; GOLD remains documented here only for the `gold_sf` ablation.

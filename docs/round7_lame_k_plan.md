@@ -40,3 +40,5 @@ Validation peaks near k = 20 and declines at k = 30. All three variants qualify;
 ```
 
 It took **87.5 s / 848 MiB** locally. The verified upload copy is `runs/final_lame_view8_k20/submission.csv` (SHA-256 `062625d79f05c638bc92bda13956e10af2ea5dd22307eb5a0358dd37bc24697f`, matching its log); the reproduction snapshot is in `runs/lame_view8_k20_candidate/`. Against k = 10, **1468/12,288 (11.9%)** test predictions differ, versus 141/2112 (6.7%) on validation. No test labels were read. Public score pending; the root `submission.csv` stays `lame_view8_k10`.
+
+The user subsequently reported **public 0.87906** for this file, versus 0.87483 for k = 10. The gain is only **+0.00423**, against +86 validation images (+4.1 points). Most of the validation gain did not transfer, so neighbor count is saturating on the test stream. `lame_view8_k20` is now selected for the root `submission.csv`, staged COOL files, and Q4 figure (`runs/q4_lame_view8_k20/`). For context, the user reported the public leaderboard's top score as 0.9567, with this submission ranked 63/77.
