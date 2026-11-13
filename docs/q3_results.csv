@@ -33,3 +33,7 @@ LAME k20 + source-mixed BN 0.9,1995,2112,0.9446022727,39.9148,16.1,848,"0.9 batc
 LAME k20 + source-mixed BN 0.7,2011,2112,0.9521780303,40.6723,16.1,848,"0.7 batch + 0.3 source BN statistics; round 8",bf99b69,runs/round8_lame8k20_mix07/val_run_log.json
 LAME k20 + per-view EMA BN 0.3,2019,2112,0.9559659091,41.0511,16.1,848,"per-view EMA BN statistics momentum 0.3; round 8; selected test CSV; public 0.89143; local test 91.6 s",bf99b69,runs/round8_lame8k20_ema03/val_run_log.json
 LAME k20 + per-view EMA BN 0.1,1962,2112,0.9289772727,38.3523,16.1,848,"per-view EMA BN statistics momentum 0.1; round 8",bf99b69,runs/round8_lame8k20_ema01/val_run_log.json
+LAME k20 + per-view EMA BN 0.2,2019,2112,0.9559659091,41.0511,16.1,848,"EMA momentum 0.2; round 9; no gain",4f87d05,runs/round9_lame8k20_ema02/val_run_log.json
+LAME k20 + per-view EMA BN 0.5,2005,2112,0.9493371212,40.3883,16.1,848,"EMA momentum 0.5; round 9",4f87d05,runs/round9_lame8k20_ema05/val_run_log.json
+LAME k15 + per-view EMA BN 0.3,2007,2112,0.9502840909,40.4830,16.1,848,"k 15 with EMA BN; round 9",4f87d05,runs/round9_lame8k15_ema03/val_run_log.json
+LAME k30 + per-view EMA BN 0.3,2005,2112,0.9493371212,40.3883,16.1,848,"k 30 with EMA BN; round 9",4f87d05,runs/round9_lame8k30_ema03/val_run_log.json

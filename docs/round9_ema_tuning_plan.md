@@ -22,4 +22,14 @@ Official validation harness, supplied checkpoint, seed 0, diagnostics off, one c
 
 ## Results
 
-Pending.
+All runs used code commit `4f87d05`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s |
+| --- | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03` (control) | 2019 | .955966 | — | 16.0 |
+| `lame8k20_ema02` | 2019 | .955966 | 0 | 16.1 |
+| `lame8k20_ema05` | 2005 | .949337 | −14 | 16.1 |
+| `lame8k15_ema03` | 2007 | .950284 | −12 | 16.1 |
+| `lame8k30_ema03` | 2005 | .949337 | −14 | 16.1 |
+
+No candidate qualifies. Momentum 0.2–0.3 and k = 20 form a flat local optimum on validation, so **no test pass** was run. The selected method stays `lame8k20_ema03`. Further gains need a different component, not more tuning of these two settings.
