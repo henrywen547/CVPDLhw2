@@ -85,6 +85,9 @@ class LameCurrentBatch:
     def _select_view(self, index):
         """Hook for view-specific normalization state; no-op by default."""
 
+    def _after_view(self, index, output):
+        """Hook called with each view's softmax output; no-op by default."""
+
     @torch.no_grad()
     def __call__(self, x):
         views = [x]
@@ -101,6 +104,7 @@ class LameCurrentBatch:
         for index, view in enumerate(views):
             self._select_view(index)
             output = self.model(view).softmax(dim=1)
+            self._after_view(index, output)
             probability = output if probability is None else probability + output
             feature_sum = self.feature if feature_sum is None else feature_sum + self.feature
         self.feature = None
@@ -225,6 +229,44 @@ class LameK15Ema03(LameEightViewK20RobustBN):
 class LameK30Ema03(LameEightViewK20RobustBN):
     neighbors = 30
     bn_mode, bn_alpha = "ema", 0.3
+
+
+class LameBalancedBN(LameEightViewK20RobustBN):
+    """k = 20, per-view EMA BN 0.3, with class-balanced batch statistics.
+
+    Simplified, independent variant of TRIBE's balanced BN (Su et al., AAAI
+    2024). View 0 (the original image) is normalized with plain batch
+    statistics; its argmax gives pseudo-labels for the current batch. Views
+    1-7 then compute batch statistics with per-sample weights proportional to
+    count(predicted class) ** -gamma, so class-correlated batches bias the
+    statistics less. The weighted statistics feed the same per-view EMA.
+    TRIBE's per-class running statistics and tri-net training are not used.
+    """
+
+    bn_mode, bn_alpha = "ema", 0.3
+    gamma = 1.0
+
+    def _after_view(self, index, output):
+        if index != 0:
+            return
+        labels = output.argmax(dim=1)
+        counts = torch.bincount(labels, minlength=output.shape[1]).to(output.dtype)
+        weight = counts[labels].pow(-self.gamma)
+        weight = weight / weight.sum()
+        for module in self.robust_bn:
+            module.sample_weight = weight
+
+    def _after_batch(self, feature, refined):
+        for module in self.robust_bn:
+            module.sample_weight = None
+
+
+class LameBalancedBN05(LameBalancedBN):
+    gamma = 0.5
+
+
+class LameBalancedBN10(LameBalancedBN):
+    gamma = 1.0
 
 
 class LameT3A(LameEightViewK20RobustBN):

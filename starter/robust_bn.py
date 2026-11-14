@@ -33,9 +33,19 @@ class RobustBatchNorm2d(nn.Module):
         self.weight, self.bias = bn.weight, bn.bias
         self.view = 0
         self.state = {}
+        # Optional per-sample weights (summing to 1) for class-balanced batch
+        # statistics; None keeps the plain batch statistics.
+        self.sample_weight = None
 
     def forward(self, x):
-        var, mean = torch.var_mean(x, dim=(0, 2, 3), unbiased=False)
+        if self.sample_weight is None:
+            var, mean = torch.var_mean(x, dim=(0, 2, 3), unbiased=False)
+        else:
+            # Weighted batch statistics via the law of total variance.
+            sample_var, sample_mean = torch.var_mean(x, dim=(2, 3), unbiased=False)
+            w = self.sample_weight[:, None]
+            mean = (w * sample_mean).sum(dim=0)
+            var = (w * (sample_var + sample_mean * sample_mean)).sum(dim=0) - mean * mean
         if self.mode == "mix":
             a = self.alpha
             mean = a * mean + (1 - a) * self.source_mean
