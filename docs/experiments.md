@@ -142,3 +142,7 @@ At commit `da60dfa`, blending 10%, 20%, or 30% source statistics into the per-vi
 ## Round 11: T3A-style prototype prior
 
 At commit `4457d66`, a T3A-style support-set prior fed by LAME-refined labels was added to `lame8k20_ema03`. The control reproduced 2019/2112. The pure prototype prior collapsed: 1127 with M = 20 and 1011 with M = 100, predicting only 14 and 10 classes. The 50/50 source/prototype blend scored 2016. No test pass was run. Diagnosis: [round11_t3a_plan.md](round11_t3a_plan.md).
+
+## Round 12: class-balanced BN statistics
+
+At commit `7493429`, class-balanced batch statistics (simplified TRIBE balanced BN, pseudo-labels from view 0) on `lame8k20_ema03` scored 2019 (γ = 0.5) and 2015 (γ = 1.0), against the control's 2019, at 16.7–16.8 s on validation. No test pass was run. Details: [round12_balanced_bn_plan.md](round12_balanced_bn_plan.md).

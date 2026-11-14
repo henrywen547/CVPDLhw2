@@ -28,4 +28,12 @@ Selected method: `lame8k20_ema03`, validation 2019/2112, user-reported public **
 
 ## Results
 
-Pending.
+All runs used code commit `7493429`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03` (control) | 2019 | .955966 | — | 16.1 | 848 |
+| `lame_bbn05` | 2019 | .955966 | 0 | 16.8 | 850 |
+| `lame_bbn10` | 2015 | .954072 | −4 | 16.7 | 850 |
+
+No candidate qualifies, and both exceed the 16.5 s time guard, so **no test pass** was run. Per-view EMA already averages statistics over several correlated batches, which may leave little within-batch class bias for re-weighting to remove. Pseudo-labels from a single view are also noisier than the final LAME labels. The selected method stays `lame8k20_ema03`.
