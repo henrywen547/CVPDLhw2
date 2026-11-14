@@ -106,6 +106,7 @@ class LameCurrentBatch:
         self.feature = None
         probability = probability / len(views)
         feature = feature_sum / len(views)
+        probability = self._prior(probability, feature)
         if self.use_memory and self.memory is not None:
             refined = adjust_outputs_with_memory(probability, feature, *self.memory,
                                                  neighbors=self.neighbors)
@@ -113,7 +114,15 @@ class LameCurrentBatch:
             refined = adjust_outputs(probability, feature, neighbors=self.neighbors)
         if self.use_memory:
             self.memory = (feature, refined)
+        self._after_batch(feature, refined)
         return refined.argmax(dim=1)
+
+    def _prior(self, probability, feature):
+        """Hook to replace the LAME prior; identity by default."""
+        return probability
+
+    def _after_batch(self, feature, refined):
+        """Hook called after the current batch's outputs are final; no-op."""
 
 
 class LameSixView(LameCurrentBatch):
@@ -216,6 +225,75 @@ class LameK15Ema03(LameEightViewK20RobustBN):
 class LameK30Ema03(LameEightViewK20RobustBN):
     neighbors = 30
     bn_mode, bn_alpha = "ema", 0.3
+
+
+class LameT3A(LameEightViewK20RobustBN):
+    """k = 20, per-view EMA BN 0.3, with a T3A-style prototype prior.
+
+    Independent variant of T3A (Iwasawa & Matsuo, NeurIPS 2021). The support
+    set starts from the classifier's weight rows. After each batch's outputs
+    are final, the batch's view-averaged features join it with LAME-refined
+    labels and entropies (the original uses source-classifier argmax and
+    entropy). Each class keeps its `support_size` lowest-entropy members.
+    Prototype logits are `z @ normalize(sum of normalized supports per class)`,
+    as in T3A; `source_share` blends the source classifier back into the prior.
+    Only already-served batches enter the support set.
+    """
+
+    bn_mode, bn_alpha = "ema", 0.3
+    support_size = 20
+    source_share = 0.0
+
+    def __init__(self, model):
+        super().__init__(model)
+        fc = self.model.fc
+        weight = fc.weight.detach()
+        with torch.no_grad():
+            warm = fc(weight).softmax(dim=1)
+        self.supports = F.normalize(weight, dim=1)
+        self.labels = warm.argmax(dim=1)
+        self.entropy = -(warm * warm.clamp_min(1e-12).log()).sum(dim=1)
+        self.classes = fc.out_features
+
+    def _prototype_logits(self, feature):
+        onehot = F.one_hot(self.labels, self.classes).to(self.supports.dtype)
+        prototypes = F.normalize(self.supports.T @ onehot, dim=0)
+        return feature @ prototypes
+
+    def _prior(self, probability, feature):
+        prototype = self._prototype_logits(feature).softmax(dim=1)
+        if self.source_share:
+            s = self.source_share
+            return s * probability + (1 - s) * prototype
+        return prototype
+
+    def _after_batch(self, feature, refined):
+        entropy = -(refined * refined.clamp_min(1e-12).log()).sum(dim=1)
+        supports = torch.cat((self.supports, F.normalize(feature, dim=1)))
+        labels = torch.cat((self.labels, refined.argmax(dim=1)))
+        entropies = torch.cat((self.entropy, entropy))
+        keep = []
+        for label in labels.unique():
+            members = (labels == label).nonzero().flatten()
+            if len(members) > self.support_size:
+                members = members[entropies[members].topk(self.support_size,
+                                                           largest=False).indices]
+            keep.append(members)
+        keep = torch.cat(keep)
+        self.supports, self.labels, self.entropy = supports[keep], labels[keep], entropies[keep]
+
+
+class LameT3AM20(LameT3A):
+    support_size = 20
+
+
+class LameT3AM100(LameT3A):
+    support_size = 100
+
+
+class LameT3AMixM20(LameT3A):
+    support_size = 20
+    source_share = 0.5
 
 
 class LameEightViewMemory(LameEightView):
