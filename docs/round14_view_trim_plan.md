@@ -39,3 +39,17 @@ Its trimming-only base class `CT` classifies the trimmed feature with the origin
 - A candidate needs **≥ 10 more correct images** than the control, and validation harness time **≤ 1.05 ×** the control's.
 - No rank, tolerance, crop, or trimming-weight sweep after seeing the outcome. If neither candidate qualifies, the branch stops.
 - At most one qualifying candidate (the larger gain; `lame_trim_prior` on a tie) gets one test pass and one public check. The selected artifact stays until a public score above 0.89257.
+
+## Results
+
+All runs used code commit `c8bd656`, seed 0, and diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Predictions changed | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03_src02` (control) | 2018 | .955492 | — | — | 16.2 | 848 |
+| `lame_trim_prior` | 1981 | .937973 | −37 | 78 | 16.4 | 890 |
+| `lame_trim_both` | 1886 | .892992 | −132 | 200 | 16.3 | 890 |
+
+The control CSV is byte-identical to round 10's `lame8k20_ema03_src02`. Neither candidate qualifies, so **no test pass** was run and the branch stops here as predeclared. The selected method stays `lame8k20_ema03_src02`.
+
+Both arms lose accuracy, and trimming the graph features hurts most. A plausible reading: on this stream, the main within-image variation across flips and 70–100% crops carries class evidence, such as object scale and extent, rather than nuisance. Every view also shares the same corruption, so this direction cannot isolate the corruption factor that TACT's photometric augmentations target. Each image also gets its own direction, which distorts the cosine neighborhoods the graph relies on. This rejects only this low-cost integration, not TACT itself.

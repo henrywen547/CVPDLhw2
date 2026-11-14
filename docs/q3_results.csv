@@ -45,3 +45,5 @@ LAME k20 + EMA BN + T3A prior M100,1011,2112,0.4786931818,-6.6761,16.1,852,"T3A-
 LAME k20 + EMA BN + 50/50 source/T3A prior M20,2016,2112,0.9545454545,40.9091,16.1,852,"blended prior; round 11; within noise",4457d66,runs/round11_lame_t3a_mix_m20/val_run_log.json
 LAME k20 + EMA BN + class-balanced statistics gamma 0.5,2019,2112,0.9559659091,41.0511,16.8,850,"simplified TRIBE balanced BN; round 12; no gain",7493429,runs/round12_lame_bbn05/val_run_log.json
 LAME k20 + EMA BN + class-balanced statistics gamma 1.0,2015,2112,0.9540719697,40.8617,16.7,850,"simplified TRIBE balanced BN; round 12",7493429,runs/round12_lame_bbn10/val_run_log.json
+LAME k20 + EMA BN + 20% source prior + view-trimmed prior,1981,2112,0.9379734848,39.2519,16.4,890,"TACT-inspired rank-1 within-image view-variation trimming of classifier evidence; round 14",c8bd656,runs/round14_lame_trim_prior/val_run_log.json
+LAME k20 + EMA BN + 20% source prior + view-trimmed prior and graph,1886,2112,0.8929924242,34.7538,16.3,890,"TACT-inspired trimming also on graph features; round 14",c8bd656,runs/round14_lame_trim_both/val_run_log.json

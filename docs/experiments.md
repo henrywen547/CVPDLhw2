@@ -152,3 +152,7 @@ At commit `7493429`, class-balanced batch statistics (simplified TRIBE balanced 
 With the user's agreement, two predeclared, mechanism-motivated candidates received one full test pass each at commit `b654e43`: `lame8k20_ema03_src01` (validation 2020; 92.3 s locally) and `lame8k20_mix07` (validation 2011; 92.0 s). They differ from the selected method on 341 and 916 test predictions. The user reported public **0.89241** for A and **0.88688** for B, so `lame8k20_ema03_src01` is now the selected method (a small gain of about six public images). Details: [round13_public_screen_plan.md](round13_public_screen_plan.md).
 
 Follow-up C: `lame8k20_ema03_src02` (EMA + 20% source statistics, validation 2018) received one full test pass at commit `a11ff47`, taking 92.3 s locally. The user reported public **0.89257** (+0.00016 over A, within noise), so it is now the selected method; no larger source share is planned.
+
+## Round 14: TACT-inspired view-variation trimming
+
+At commit `c8bd656`, the selected `lame8k20_ema03_src02` was extended with per-image rank-1 trimming of the leading within-image variation direction across its eight existing views. The design follows TACT (NeurIPS 2025) but is simplified and independently written. The control reproduced 2018/2112 byte-identically. Trimming only the classifier evidence scored **1981** (−37). Trimming the graph features as well scored **1886** (−132). Overhead was about 1% on validation. No test pass was run, and the branch stops as predeclared. Details: [round14_view_trim_plan.md](round14_view_trim_plan.md).
