@@ -24,3 +24,7 @@ The user reported **A: public 0.89241** and **B: public 0.88688**, versus 0.8914
 
 - A's gain of +0.00098 is about six images of the 6,144-image public half, which is small and not established as meaningful. A changes only 2.8% of test predictions and is neutral on validation, so per the switching rule `lame8k20_ema03_src01` becomes the selected method for the root `submission.csv`, staged COOL files, and Q4 figure.
 - B is lower by 0.00455. Dropping the EMA in favor of instant source-mixed statistics hurts on the test stream, so cross-batch smoothing matters more there than reacting immediately to domain changes.
+
+## Follow-up: candidate C
+
+At the user's request, after A's small public gain, the predeclared follow-up C, `lame8k20_ema03_src02` (EMA + 20% source statistics, validation 2018), received one full test pass at commit `a11ff47`. It took **92.3 s / 848 MiB** locally and differs from A on 343 and from `lame8k20_ema03` on 617 of the 12,288 test predictions. The upload file is `runs/final_lame8k20_ema03_src02/submission.csv` (SHA-256 `56924a47…a2fc57`); the snapshot is in `runs/lame8k20_ema03_src02_candidate/`. Public score pending; the root submission stays A. This ends the source-share direction: no larger share is planned whatever C scores, to avoid tuning on public.
