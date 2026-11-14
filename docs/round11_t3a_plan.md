@@ -36,4 +36,17 @@ Official validation harness, supplied checkpoint, seed 0, diagnostics off, one c
 
 ## Results
 
-Pending.
+All runs used code commit `4457d66`, seed 0, diagnostics off, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03` (control) | 2019 | .955966 | — | 16.0 | 848 |
+| `lame_t3a_m20` | 1127 | .533617 | −892 | 16.1 | 852 |
+| `lame_t3a_m100` | 1011 | .478693 | −1008 | 16.1 | 852 |
+| `lame_t3a_mix_m20` | 2016 | .954545 | −3 | 16.1 | 852 |
+
+The control reproduced 2019, so the new base-class hooks did not change existing methods. The pure T3A prior **collapses below the frozen source model** (1152), and the 50/50 blend is within noise of the control. No candidate qualifies, so no test pass was run.
+
+Label-free diagnosis from the official prediction CSVs: the control predicts all 20 classes, with the largest class at 6–9% in each third of the stream. `t3a_m20` predicts only 14 classes and `t3a_m100` only 10. One class (9) takes 309 and 551 predictions, and the largest class's share in the first third is 25% and 40%. This is a first-come takeover: classes that enter the support set early dominate.
+
+A plausible explanation, not verified: post-ReLU average-pool features are non-negative and share a large common direction. Prototypes built from real features therefore score higher than classes still represented only by classifier weight rows. Under class-correlated streams, classes seen first then absorb later samples. This matches NOTE's (NeurIPS 2022) observation that T3A degrades on temporally correlated streams. A centered-feature variant might avoid the takeover, but the blend result (−3) suggests limited upside; it was not pursued.

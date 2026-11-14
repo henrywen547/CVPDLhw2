@@ -138,3 +138,7 @@ At commit `4f87d05`, the control `lame8k20_ema03` reproduced 2019/2112. Momentum
 ## Round 10: hybrid EMA + source-prior BN
 
 At commit `da60dfa`, blending 10%, 20%, or 30% source statistics into the per-view EMA normalization scored 2020, 2018, and 2017, against the control's 2019. All are within noise, so no test pass was run and the selected method is unchanged. Details: [round10_hybrid_bn_plan.md](round10_hybrid_bn_plan.md).
+
+## Round 11: T3A-style prototype prior
+
+At commit `4457d66`, a T3A-style support-set prior fed by LAME-refined labels was added to `lame8k20_ema03`. The control reproduced 2019/2112. The pure prototype prior collapsed: 1127 with M = 20 and 1011 with M = 100, predicting only 14 and 10 classes. The 50/50 source/prototype blend scored 2016. No test pass was run. Diagnosis: [round11_t3a_plan.md](round11_t3a_plan.md).
