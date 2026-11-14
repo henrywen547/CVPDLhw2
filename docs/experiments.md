@@ -149,4 +149,4 @@ At commit `7493429`, class-balanced batch statistics (simplified TRIBE balanced 
 
 ## Round 13: public screening of two BN candidates
 
-With the user's agreement, two predeclared, mechanism-motivated candidates received one full test pass each at commit `b654e43`: `lame8k20_ema03_src01` (validation 2020; 92.3 s locally) and `lame8k20_mix07` (validation 2011; 92.0 s). They differ from the selected method on 341 and 916 test predictions. Public scores are pending. Details: [round13_public_screen_plan.md](round13_public_screen_plan.md).
+With the user's agreement, two predeclared, mechanism-motivated candidates received one full test pass each at commit `b654e43`: `lame8k20_ema03_src01` (validation 2020; 92.3 s locally) and `lame8k20_mix07` (validation 2011; 92.0 s). They differ from the selected method on 341 and 916 test predictions. The user reported public **0.89241** for A and **0.88688** for B, so `lame8k20_ema03_src01` is now the selected method (a small gain of about six public images). Details: [round13_public_screen_plan.md](round13_public_screen_plan.md).

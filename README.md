@@ -75,7 +75,9 @@ A [bounded view-count check](docs/round5_view_sensitivity.md) found an eight-vie
 
 [Round 7](docs/round7_lame_k_plan.md) raised the neighbor count further: k = 15, 20, 30 scored 1967, **1987 (.940814)**, and 1974 on validation. The user reported **public 0.87906** for `runs/final_lame_view8_k20/submission.csv`, and it was selected until round 8.
 
-[Round 8](docs/round8_robust_bn_plan.md) replaced native current-batch BN with robust statistics (`starter/robust_bn.py`). Per-view EMA BN with momentum 0.3 (`lame8k20_ema03`) scored **2019/2112 (.955966)** on validation. The user reported **public 0.89143** for `runs/final_lame8k20_ema03/submission.csv`, so `lame8k20_ema03` is now the selected method: the root `submission.csv`, `runs/submission_staging/`, and the Q4 report figure correspond to it.
+[Round 8](docs/round8_robust_bn_plan.md) replaced native current-batch BN with robust statistics (`starter/robust_bn.py`). Per-view EMA BN with momentum 0.3 (`lame8k20_ema03`) scored **2019/2112 (.955966)** on validation. The user reported **public 0.89143** for `runs/final_lame8k20_ema03/submission.csv`, and it was selected until round 13.
+
+Rounds 9–12 ([9](docs/round9_ema_tuning_plan.md), [10](docs/round10_hybrid_bn_plan.md), [11](docs/round11_t3a_plan.md), [12](docs/round12_balanced_bn_plan.md)) found no validation gain from EMA/k tuning, a source prior, a T3A-style prototype prior, or class-balanced BN. [Round 13](docs/round13_public_screen_plan.md) therefore judged two predeclared candidates on public. `lame8k20_ema03_src01` (EMA + 10% source statistics) scored **public 0.89241** and `lame8k20_mix07` scored 0.88688. `lame8k20_ema03_src01` is now the selected method: the root `submission.csv`, `runs/submission_staging/`, and the Q4 report figure correspond to it.
 
 ## Official test artifacts and current submission
 
@@ -143,15 +145,23 @@ The earlier `lame_view8_k20` artifact was run from `CVPDLhw2/starter` at commit 
 
 It scored **1987/2112 (.940814)** on validation and **public 0.87906** as reported by the user. The full local test took **87.5 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti. Its paired official CSV/log hash is `062625d79f05c638bc92bda13956e10af2ea5dd22307eb5a0358dd37bc24697f`. These files remain preserved.
 
-The current **`lame8k20_ema03`** artifact was run from `CVPDLhw2/starter` at commit `bf99b69`:
+The earlier `lame8k20_ema03` artifact was run from `CVPDLhw2/starter` at commit `bf99b69`:
 
 ```bash
 ../../.venv/bin/python run.py --method lame8k20_ema03 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame8k20_ema03 --seed 0
 ```
 
-It scored **2019/2112 (.955966)** on validation and **public 0.89143** as reported by the user. The full local test took **91.6 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti, slightly above 90 s on this GPU; the grading RTX 3090 is expected to be faster but is unmeasured. Its paired official CSV/log hash is `195be44f8e8b27d5247483d0bf001732348d9e47d15c849b44373856477e69cf`. Private accuracy remains unknown.
+It scored **2019/2112 (.955966)** on validation and **public 0.89143** as reported by the user. The full local test took **91.6 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti, slightly above 90 s on this GPU; the grading RTX 3090 is expected to be faster but is unmeasured. Its paired official CSV/log hash is `195be44f8e8b27d5247483d0bf001732348d9e47d15c849b44373856477e69cf`. These files remain preserved.
 
-To regenerate the Kaggle upload filename from the current `lame8k20_ema03` official run, without rerunning the test stream, run from the repository root:
+The current **`lame8k20_ema03_src01`** artifact was run from `CVPDLhw2/starter` at commit `b654e43`:
+
+```bash
+../../.venv/bin/python run.py --method lame8k20_ema03_src01 --split test --data ../../data --ckpt ../../source_resnet50_160.pth --out ../runs/final_lame8k20_ema03_src01 --seed 0
+```
+
+It scored **2020/2112 (.956439)** on validation and **public 0.89241** as reported by the user. The full local test took **92.3 seconds** and **848 MiB** peak VRAM on the GTX 1080 Ti, slightly above 90 s on this GPU; the grading RTX 3090 is expected to be faster but is unmeasured. Its paired official CSV/log hash is `d5e6f3445c352d77aace4a6cd6bce111f7d33cf83b8757bedb356173af66aebb`. Private accuracy remains unknown.
+
+To regenerate the Kaggle upload filename from the current `lame8k20_ema03_src01` official run, without rerunning the test stream, run from the repository root:
 
 ```bash
 ../.venv/bin/python scripts/make_submission.py
@@ -163,7 +173,7 @@ The Q4 report-only validation-image procedure is documented in [docs/q4_procedur
 The same local folder also contains the original paper PDFs for offline Q1 reading (LAME and COME are the Q1 papers; GOLD is kept for the `gold_sf` ablation); their links and checksums are in its `README.md`.
 
 ```bash
-../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame8k20_ema03/q4_examples.png --q4-metadata runs/q4_lame8k20_ema03/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
+../.venv/bin/python scripts/collect_report_materials.py --allow-val-images-for-q4 --q4-figure runs/q4_lame8k20_ema03_src01/q4_examples.png --q4-metadata runs/q4_lame8k20_ema03_src01/q4_examples.json --val-images ../data/val/images --classes starter/classes.txt --out runs/report_materials
 ```
 
 ## Rules

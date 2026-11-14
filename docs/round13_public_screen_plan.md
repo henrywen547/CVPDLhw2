@@ -19,3 +19,8 @@ Both full test passes ran at commit `b654e43` on the local GTX 1080 Ti:
 | B `lame8k20_mix07` | 92.0 | 848 | 916 / 12,288 (7.5%) | `runs/final_lame8k20_mix07/submission.csv` (`aee0e616…87080`) |
 
 A and B differ from each other on 833 test predictions. Both CSVs match their logs, and reproduction snapshots are in `runs/<method>_candidate/`. No test labels were read. Public scores are pending; the root `submission.csv` stays `lame8k20_ema03`.
+
+The user reported **A: public 0.89241** and **B: public 0.88688**, versus 0.89143 for the selected method.
+
+- A's gain of +0.00098 is about six images of the 6,144-image public half, which is small and not established as meaningful. A changes only 2.8% of test predictions and is neutral on validation, so per the switching rule `lame8k20_ema03_src01` becomes the selected method for the root `submission.csv`, staged COOL files, and Q4 figure.
+- B is lower by 0.00455. Dropping the EMA in favor of instant source-mixed statistics hurts on the test stream, so cross-batch smoothing matters more there than reacting immediately to domain changes.
