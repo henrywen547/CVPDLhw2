@@ -146,3 +146,7 @@ At commit `4457d66`, a T3A-style support-set prior fed by LAME-refined labels wa
 ## Round 12: class-balanced BN statistics
 
 At commit `7493429`, class-balanced batch statistics (simplified TRIBE balanced BN, pseudo-labels from view 0) on `lame8k20_ema03` scored 2019 (γ = 0.5) and 2015 (γ = 1.0), against the control's 2019, at 16.7–16.8 s on validation. No test pass was run. Details: [round12_balanced_bn_plan.md](round12_balanced_bn_plan.md).
+
+## Round 13: public screening of two BN candidates
+
+With the user's agreement, two predeclared, mechanism-motivated candidates received one full test pass each at commit `b654e43`: `lame8k20_ema03_src01` (validation 2020; 92.3 s locally) and `lame8k20_mix07` (validation 2011; 92.0 s). They differ from the selected method on 341 and 916 test predictions. Public scores are pending. Details: [round13_public_screen_plan.md](round13_public_screen_plan.md).

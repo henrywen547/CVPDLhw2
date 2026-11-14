@@ -11,4 +11,11 @@ Both run from the same code commit; later code additions (no-op hooks, optional 
 
 ## Results
 
-Pending.
+Both full test passes ran at commit `b654e43` on the local GTX 1080 Ti:
+
+| Candidate | Local test s | Peak VRAM MiB | Test predictions differing from selected `lame8k20_ema03` | Upload file (SHA-256) |
+| --- | ---: | ---: | ---: | --- |
+| A `lame8k20_ema03_src01` | 92.3 | 848 | 341 / 12,288 (2.8%) | `runs/final_lame8k20_ema03_src01/submission.csv` (`d5e6f344…6aebb`) |
+| B `lame8k20_mix07` | 92.0 | 848 | 916 / 12,288 (7.5%) | `runs/final_lame8k20_mix07/submission.csv` (`aee0e616…87080`) |
+
+A and B differ from each other on 833 test predictions. Both CSVs match their logs, and reproduction snapshots are in `runs/<method>_candidate/`. No test labels were read. Public scores are pending; the root `submission.csv` stays `lame8k20_ema03`.
