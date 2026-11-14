@@ -111,6 +111,7 @@ class LameCurrentBatch:
         probability = probability / len(views)
         feature = feature_sum / len(views)
         probability = self._prior(probability, feature)
+        feature = self._graph_feature(feature)
         if self.use_memory and self.memory is not None:
             refined = adjust_outputs_with_memory(probability, feature, *self.memory,
                                                  neighbors=self.neighbors)
@@ -124,6 +125,10 @@ class LameCurrentBatch:
     def _prior(self, probability, feature):
         """Hook to replace the LAME prior; identity by default."""
         return probability
+
+    def _graph_feature(self, feature):
+        """Hook to replace the graph's view-averaged feature; identity."""
+        return feature
 
     def _after_batch(self, feature, refined):
         """Hook called after the current batch's outputs are final; no-op."""
@@ -336,6 +341,76 @@ class LameT3AM100(LameT3A):
 class LameT3AMixM20(LameT3A):
     support_size = 20
     source_share = 0.5
+
+
+class LameViewTrim(LameEightViewK20RobustBN):
+    """Selected src02 method with per-image view-variation trimming.
+
+    Independent, simplified component inspired by TACT (Liu et al., *Test-Time
+    Adaptation by Causal Trimming*, NeurIPS 2025). For each image, the eight
+    existing view features (no extra backbone pass) are centered and the
+    leading direction u of their within-image variation is found from the 8x8
+    Gram matrix. Each view feature is trimmed as f - (f.u)u. With
+    `trim_prior`, each trimmed view feature goes through the supplied
+    classifier (bias kept) and the view softmaxes are averaged in the same
+    order as the baseline. With `trim_graph`, the graph uses the mean trimmed
+    feature. Only one direction is removed; images whose views carry
+    (numerically) no variation are not trimmed. TACT's augmentations and
+    accumulated trimmed prototypes are not used.
+    """
+
+    bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.2
+    trim_prior = True
+    trim_graph = False
+    relative_tolerance = 1e-6
+
+    def _after_view(self, index, output):
+        if index == 0:
+            self.view_features = []
+            self.direction = None
+        self.view_features.append(self.feature)
+
+    def _trim_direction(self):
+        if self.direction is None:
+            stacked = torch.stack(self.view_features, dim=1)  # (B, V, D)
+            centered = stacked - stacked.mean(dim=1, keepdim=True)
+            gram = centered @ centered.transpose(1, 2)  # (B, V, V)
+            values, vectors = torch.linalg.eigh(gram)  # ascending
+            direction = (vectors[..., -1:].transpose(1, 2) @ centered).squeeze(1)
+            energy = stacked.square().sum(dim=(1, 2)) / stacked.shape[1]
+            valid = values[..., -1] > self.relative_tolerance * energy
+            norm = direction.norm(dim=1, keepdim=True).clamp_min(1e-12)
+            self.direction = torch.where(valid[:, None], direction / norm,
+                                         torch.zeros_like(direction))
+        return self.direction
+
+    def _trim(self, feature):
+        u = self._trim_direction()
+        return feature - (feature * u).sum(dim=1, keepdim=True) * u
+
+    def _prior(self, probability, feature):
+        if not self.trim_prior:
+            return probability
+        total = None
+        for view_feature in self.view_features:
+            output = self.model.fc(self._trim(view_feature)).softmax(dim=1)
+            total = output if total is None else total + output
+        return total / len(self.view_features)
+
+    def _graph_feature(self, feature):
+        return self._trim(feature) if self.trim_graph else feature
+
+    def _after_batch(self, feature, refined):
+        self.view_features = None
+        self.direction = None
+
+
+class LameTrimPrior(LameViewTrim):
+    trim_prior, trim_graph = True, False
+
+
+class LameTrimBoth(LameViewTrim):
+    trim_prior, trim_graph = True, True
 
 
 class LameEightViewMemory(LameEightView):
