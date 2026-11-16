@@ -15,3 +15,19 @@ At the user's request, two follow-ups were checked with one test pass each at `3
 Validation is within noise for both, as in rounds 9–16. `lame_bbn05_src03` takes 96.1 s locally, a 6.1 s overrun. If its public gain is clear, it should first get a speed optimization of the weighted statistics, or the user should decide explicitly on the time risk.
 
 Selection rule: unchanged. Switch only on a public score above 0.89420. A gain of one or two images is noise.
+
+## Results (user-reported public)
+
+| Run | Public | Δ vs. 0.89420 |
+| --- | ---: | ---: |
+| `lame8k20_ema03_src04` | 0.89371 | −0.00049 |
+| `lame_bbn05_src03` | **0.89599** | +0.00179 (≈ 11 images) |
+
+- **Selected: `lame_bbn05_src03`.** The two mechanisms combine. On top of EMA 0.3, class-balanced statistics alone gained +0.00293 and the 30% source share alone +0.00277. Together they gained +0.00456.
+- **Source share peaks near 30%.** 40% falls back below 30%, so that direction is closed.
+
+**Time.** The weighted statistics add 19 ms per batch (481.4 versus 462.1 ms, random-input profile), about 4%. The cost is a few small per-layer operations on per-sample statistics. Any rewrite that fuses them changes the floating-point reduction order, so it would not reproduce the uploaded predictions. It would save an estimated ~2 s and still leave the run above 90 s locally. The method is therefore kept as is.
+
+The work is dominated by convolutions plus bandwidth-bound BN and reductions. The RTX 3090 has about 1.9× the 1080 Ti's memory bandwidth and uses TF32 for convolutions by default, so the 96.1 s local run is expected to finish well within 90 s there. This is an estimate, not a measurement.
+
+The root `submission.csv`, `runs/submission_staging/` (code at `356cea2`), and the Q4 figure (`runs/q4_lame_bbn05_src03/`) now correspond to `lame_bbn05_src03`. The eight Q4 examples are the same as for src03.

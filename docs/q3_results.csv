@@ -39,7 +39,7 @@ LAME k15 + per-view EMA BN 0.3,2007,2112,0.9502840909,40.4830,16.1,848,"k 15 wit
 LAME k30 + per-view EMA BN 0.3,2005,2112,0.9493371212,40.3883,16.1,848,"k 30 with EMA BN; round 9",4f87d05,runs/round9_lame8k30_ema03/val_run_log.json
 LAME k20 + EMA BN 0.3 + 10% source prior,2020,2112,0.9564393939,41.0985,16.2,848,"hybrid BN; round 10; round 13 A; public 0.89241; local test 92.3 s",da60dfa,runs/round10_lame8k20_ema03_src01/val_run_log.json
 LAME k20 + EMA BN 0.3 + 20% source prior,2018,2112,0.9554924242,41.0038,16.2,848,"hybrid BN; round 10; test CSV (round 13 C); public 0.89257; local test 92.3 s",da60dfa,runs/round10_lame8k20_ema03_src02/val_run_log.json
-LAME k20 + EMA BN 0.3 + 30% source prior,2017,2112,0.9550189394,40.9564,16.2,848,"hybrid BN; round 10; selected test CSV (round 16); public 0.89420; local test 92.3 s",da60dfa,runs/round10_lame8k20_ema03_src03/val_run_log.json
+LAME k20 + EMA BN 0.3 + 30% source prior,2017,2112,0.9550189394,40.9564,16.2,848,"hybrid BN; round 10; test CSV (round 16); public 0.89420; local test 92.3 s",da60dfa,runs/round10_lame8k20_ema03_src03/val_run_log.json
 LAME k20 + EMA BN + T3A prior M20,1127,2112,0.5336174242,-1.1837,16.1,852,"T3A-style prototype prior fed by LAME labels; collapses to 14 classes; round 11",4457d66,runs/round11_lame_t3a_m20/val_run_log.json
 LAME k20 + EMA BN + T3A prior M100,1011,2112,0.4786931818,-6.6761,16.1,852,"T3A-style prototype prior M 100; collapses to 10 classes; round 11",4457d66,runs/round11_lame_t3a_m100/val_run_log.json
 LAME k20 + EMA BN + 50/50 source/T3A prior M20,2016,2112,0.9545454545,40.9091,16.1,852,"blended prior; round 11; within noise",4457d66,runs/round11_lame_t3a_mix_m20/val_run_log.json
@@ -51,5 +51,5 @@ LAME k20 + EMA BN + 20% source prior + 100 graph updates,2017,2112,0.9550189394,
 LAME k20 + EMA BN + 20% source prior + matched-strength dense RBF graph,1391,2112,0.6586174242,11.3163,16.3,850,"within-batch collapse to majority classes; round 15",c4286eb,runs/round15_lame_src02_rbf/val_run_log.json
 LAME k20 + EMA BN + 20% source prior + layer4 source BN,1888,2112,0.8939393939,34.8485,16.0,848,"depth-selective BN; round 15",c4286eb,runs/round15_lame_src02_l4src/val_run_log.json
 LAME k20 + EMA BN 0.2 + 20% source prior,1997,2112,0.9455492424,40.0095,16.2,848,"round 16; excluded from public screening",ce0e0b8,runs/round16_lame8k20_ema02_src02/val_run_log.json
-LAME k20 + EMA BN 0.3 + 40% source prior,2012,2112,0.9526515152,40.7197,16.2,848,"round 17; local test 92.3 s",356cea2,runs/round17_lame8k20_ema03_src04/val_run_log.json
-LAME k20 + EMA BN + class-balanced statistics gamma 0.5 + 30% source prior,2017,2112,0.9550189394,40.9564,16.9,850,"round 17; local test 96.1 s",356cea2,runs/round17_lame_bbn05_src03/val_run_log.json
+LAME k20 + EMA BN 0.3 + 40% source prior,2012,2112,0.9526515152,40.7197,16.2,848,"round 17; public 0.89371; local test 92.3 s",356cea2,runs/round17_lame8k20_ema03_src04/val_run_log.json
+LAME k20 + EMA BN + class-balanced statistics gamma 0.5 + 30% source prior,2017,2112,0.9550189394,40.9564,16.9,850,"round 17; selected test CSV; public 0.89599; local test 96.1 s",356cea2,runs/round17_lame_bbn05_src03/val_run_log.json

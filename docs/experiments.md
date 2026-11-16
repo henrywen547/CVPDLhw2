@@ -176,3 +176,14 @@ Three validation-tied variants received one test pass each at `ce0e0b8`. A fourt
 - `lame_bbn05`: 0.89436, within about one image of src03 (95.6 s locally)
 
 `lame8k20_ema03_src03` is now the selected method; it is safer on time. Public rose monotonically with the source share (0.89143 → 0.89241 → 0.89257 → 0.89420 for 0/10/20/30%). Details: [round16_public_screen_plan.md](round16_public_screen_plan.md).
+
+## Round 17: combining class-balanced BN with the source prior
+
+At `356cea2`, two candidates received one test pass each:
+
+| Run | Validation | Public | Local test |
+| --- | ---: | ---: | ---: |
+| `lame8k20_ema03_src04` (40% source share) | 2012 | 0.89371 | — |
+| `lame_bbn05_src03` (class-balanced statistics + 30% source) | 2017 | **0.89599** | 96.1 s |
+
+`lame_bbn05_src03` is now the selected method; the two mechanisms gained additively on public. The source share peaks near 30%. Details and the timing analysis: [round17_public_screen_plan.md](round17_public_screen_plan.md).
