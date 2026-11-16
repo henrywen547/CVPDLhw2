@@ -281,6 +281,10 @@ class LameK20Ema03Src02(LameEightViewK20RobustBN):
     bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.2
 
 
+class LameK20Ema02Src02(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha, bn_source = "ema", 0.2, 0.2
+
+
 class LameK20Ema03Src03(LameEightViewK20RobustBN):
     bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.3
 
