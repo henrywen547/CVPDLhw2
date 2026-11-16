@@ -289,6 +289,10 @@ class LameK20Ema03Src03(LameEightViewK20RobustBN):
     bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.3
 
 
+class LameK20Ema03Src04(LameEightViewK20RobustBN):
+    bn_mode, bn_alpha, bn_source = "ema", 0.3, 0.4
+
+
 class LameK15Ema03(LameEightViewK20RobustBN):
     neighbors = 15
     bn_mode, bn_alpha = "ema", 0.3
@@ -335,6 +339,13 @@ class LameBalancedBN05(LameBalancedBN):
 
 class LameBalancedBN10(LameBalancedBN):
     gamma = 1.0
+
+
+class LameBalancedBN05Src03(LameBalancedBN):
+    """Class-balanced statistics (gamma 0.5) plus 30% source statistics."""
+
+    gamma = 0.5
+    bn_source = 0.3
 
 
 class LameT3A(LameEightViewK20RobustBN):

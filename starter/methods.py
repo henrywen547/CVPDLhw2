@@ -22,6 +22,7 @@ from lame_output import (LameCurrentBatch, LameFourView, LameSixView, LameEightV
                          LameK20Ema01, LameK20Ema02, LameK20Ema05, LameK15Ema03,
                          LameK30Ema03, LameK20Ema03Src01, LameK20Ema03Src02,
                          LameK20Ema03Src03, LameT3AM20, LameT3AM100, LameT3AMixM20, LameK20Ema02Src02,
+                         LameK20Ema03Src04, LameBalancedBN05Src03,
                          LameBalancedBN05, LameBalancedBN10,
                          LameTrimPrior, LameTrimBoth, LameSrc02Steps100,
                          LameSrc02Rbf, LameSrc02Layer4Source)
@@ -299,6 +300,8 @@ METHODS = {"source": Source, "source_diag": SourceDiagnostics, "bn_batch": Batch
            "lame8k20_ema03_src02": LameK20Ema03Src02,
            "lame8k20_ema03_src03": LameK20Ema03Src03,
            "lame8k20_ema02_src02": LameK20Ema02Src02,
+           "lame8k20_ema03_src04": LameK20Ema03Src04,
+           "lame_bbn05_src03": LameBalancedBN05Src03,
            "lame_t3a_m20": LameT3AM20, "lame_t3a_m100": LameT3AM100,
            "lame_t3a_mix_m20": LameT3AMixM20, "lame_bbn05": LameBalancedBN05,
            "lame_bbn10": LameBalancedBN10,
