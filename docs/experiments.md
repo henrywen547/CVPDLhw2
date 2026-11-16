@@ -156,3 +156,13 @@ Follow-up C: `lame8k20_ema03_src02` (EMA + 20% source statistics, validation 201
 ## Round 14: TACT-inspired view-variation trimming
 
 At commit `c8bd656`, the selected `lame8k20_ema03_src02` was extended with per-image rank-1 trimming of the leading within-image variation direction across its eight existing views. The design follows TACT (NeurIPS 2025) but is simplified and independently written. The control reproduced 2018/2112 byte-identically. Trimming only the classifier evidence scored **1981** (−37). Trimming the graph features as well scored **1886** (−132). Overhead was about 1% on validation. No test pass was run, and the branch stops as predeclared. Details: [round14_view_trim_plan.md](round14_view_trim_plan.md).
+
+## Round 15: solver length, matched RBF graph, layer4 source BN
+
+At commit `c4286eb`, three single-component changes to `lame8k20_ema03_src02` were screened against a same-commit control. The control reproduced 2018/2112 byte-identically.
+
+- **100 graph updates: 2017.** Ten steps had already converged; the median max assignment difference was 7e-6.
+- **Dense RBF graph matched to the cosine graph's mean row sum: 1391.** Within-batch predictions collapsed toward majority classes.
+- **Checkpoint statistics in all of layer4: 1888.**
+
+None qualified, so no test pass was run. Details: [round15_graph_solver_depth_bn_plan.md](round15_graph_solver_depth_bn_plan.md).

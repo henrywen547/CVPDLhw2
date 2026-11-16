@@ -42,3 +42,20 @@ Implementation notes:
 - The largest qualifying gain gets one test pass and one public check. On a tie, the lower-cost candidate wins. Nothing else is tested.
 - No bandwidth, step count, or BN cut point is chosen after seeing the results. If no candidate qualifies, this round ends, and runtime verification and the report come next.
 - The selected artifact stays until a public score above 0.89257.
+
+## Results
+
+All runs used code commit `c4286eb`, seed 0, and diagnostics off apart from the solver diagnostics described above, on the local GTX 1080 Ti:
+
+| Run | Correct / 2112 | Top-1 | Δ vs. control | Predictions changed | Harness s | Peak VRAM MiB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `lame8k20_ema03_src02` (control) | 2018 | .955492 | — | — | 16.1 | 848 |
+| `lame_src02_steps100` | 2017 | .955019 | −1 | 1 | 16.2 | 848 |
+| `lame_src02_rbf` | 1391 | .658617 | −627 | 687 | 16.3 | 850 |
+| `lame_src02_l4src` | 1888 | .893939 | −130 | 184 | 16.0 | 848 |
+
+The control CSV is byte-identical to round 10's. No candidate qualifies, so **no test pass** was run. The selected method stays `lame8k20_ema03_src02`.
+
+- **Solver.** Ten steps is already essentially converged on validation. Across the 33 batches, the median max |z₁₀ − z₁₀₀| is 7e-6 and the mean is 0.0066. One batch reaches 0.20, and it holds the only argmax change. The last-step residual is at most 3.6e-7. This sub-direction is closed.
+- **Matched RBF graph.** Matching the mean row sum spreads the same total correction over all 63 other samples, so every sample is pulled toward the batch's majority classes. Validation predictions per 64-image batch went from 10.5 distinct classes (top-class share .277) to 6.8 (.586). Global class coverage is still 20 classes. The sparse top-k selection, not just the correction strength, is what keeps cross-class edges out.
+- **layer4 source BN.** Restoring checkpoint statistics in the deepest stage loses 130 images, with 9.8 distinct classes per batch and top-class share .323. On this corruption stream, adapting late-layer statistics is clearly beneficial overall. Any label-shift sensitivity in layer4 is outweighed by the covariate shift that still reaches it.

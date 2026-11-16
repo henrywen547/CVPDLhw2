@@ -47,3 +47,6 @@ LAME k20 + EMA BN + class-balanced statistics gamma 0.5,2019,2112,0.9559659091,4
 LAME k20 + EMA BN + class-balanced statistics gamma 1.0,2015,2112,0.9540719697,40.8617,16.7,850,"simplified TRIBE balanced BN; round 12",7493429,runs/round12_lame_bbn10/val_run_log.json
 LAME k20 + EMA BN + 20% source prior + view-trimmed prior,1981,2112,0.9379734848,39.2519,16.4,890,"TACT-inspired rank-1 within-image view-variation trimming of classifier evidence; round 14",c8bd656,runs/round14_lame_trim_prior/val_run_log.json
 LAME k20 + EMA BN + 20% source prior + view-trimmed prior and graph,1886,2112,0.8929924242,34.7538,16.3,890,"TACT-inspired trimming also on graph features; round 14",c8bd656,runs/round14_lame_trim_both/val_run_log.json
+LAME k20 + EMA BN + 20% source prior + 100 graph updates,2017,2112,0.9550189394,40.9564,16.2,848,"ten steps already converged (median max diff 7e-6); round 15",c4286eb,runs/round15_lame_src02_steps100/val_run_log.json
+LAME k20 + EMA BN + 20% source prior + matched-strength dense RBF graph,1391,2112,0.6586174242,11.3163,16.3,850,"within-batch collapse to majority classes; round 15",c4286eb,runs/round15_lame_src02_rbf/val_run_log.json
+LAME k20 + EMA BN + 20% source prior + layer4 source BN,1888,2112,0.8939393939,34.8485,16.0,848,"depth-selective BN; round 15",c4286eb,runs/round15_lame_src02_l4src/val_run_log.json
