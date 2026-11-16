@@ -17,7 +17,7 @@ REPO = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pred", type=Path,
-                        default=REPO / "runs/final_lame8k20_ema03_src02/test_pred.csv")
+                        default=REPO / "runs/final_lame8k20_ema03_src03/test_pred.csv")
     parser.add_argument("--run-log", type=Path,
                         help="Defaults to test_run_log.json beside --pred")
     parser.add_argument("--out", type=Path, default=REPO / "submission.csv")

@@ -30,3 +30,17 @@ Only `final_bn_view10` and `final_tent_001` exist without a public score. Both a
 ## Selection rule
 
 The selected artifact switches only to a candidate whose user-reported public score exceeds 0.89257. Differences of one or two public images (about 0.0002–0.0003) are within noise. Picking the best of several near-ties on public inflates the public score without improving the expected private score.
+
+## Results (user-reported public)
+
+| Run | Public | Δ vs. 0.89257 |
+| --- | ---: | ---: |
+| `lame8k20_ema02` | 0.88541 | −0.00716 |
+| `lame8k20_ema03_src03` | **0.89420** | +0.00163 (≈ 10 images) |
+| `lame_bbn05` | 0.89436 | +0.00179 (≈ 11 images) |
+
+- **Selected: `lame8k20_ema03_src03`.** Public rises steadily with the source share: 0% → 10% → 20% → 30% scored 0.89143 → 0.89241 → 0.89257 → 0.89420. Validation stayed flat at 2017–2020 over the same range. This fits the hypothesis that the source prior matters mainly under test corruptions harsher than validation's.
+- **`lame_bbn05`** is within about one image of src03. Its local test overruns 90 s by 5.6 s, against 2.3 s for src03, so it is not selected. Its gain over `lame8k20_ema03` (+0.00293, with no source prior) suggests class-balanced statistics also matter on test.
+- **EMA 0.2** loses clearly. Together with round 13's no-EMA result, this places the momentum optimum near 0.3 on test as well.
+
+The root `submission.csv`, `runs/submission_staging/` (code at `ce0e0b8`), and the Q4 figure (`runs/q4_lame8k20_ema03_src03/`) now correspond to `lame8k20_ema03_src03`.
