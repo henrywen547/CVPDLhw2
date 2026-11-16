@@ -11,6 +11,9 @@ momentum alpha before normalizing, in the spirit of RoTTA's robust BN
 With `source_weight` s > 0, normalization uses (1 - s) * EMA + s * source
 statistics, while the stored EMA stays a pure average of batch statistics.
 
+`source`: normalize with the checkpoint's running statistics only (used for
+selected layers in a depth-selective ablation).
+
 Affine weights are the supplied checkpoint's and are never updated.
 """
 
@@ -22,7 +25,7 @@ import torch.nn.functional as F
 class RobustBatchNorm2d(nn.Module):
     def __init__(self, bn, mode, alpha, source_weight=0.0):
         super().__init__()
-        if mode not in ("mix", "ema"):
+        if mode not in ("mix", "ema", "source"):
             raise ValueError(mode)
         self.mode, self.alpha, self.eps = mode, alpha, bn.eps
         # `ema` only: blend this share of source statistics into the
@@ -38,6 +41,10 @@ class RobustBatchNorm2d(nn.Module):
         self.sample_weight = None
 
     def forward(self, x):
+        if self.mode == "source":
+            # Checkpoint running statistics only; no batch statistics.
+            return F.batch_norm(x, self.source_mean, self.source_var, self.weight,
+                                self.bias, False, 0.0, self.eps)
         if self.sample_weight is None:
             var, mean = torch.var_mean(x, dim=(0, 2, 3), unbiased=False)
         else:

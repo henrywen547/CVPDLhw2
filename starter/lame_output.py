@@ -5,30 +5,84 @@ This local variant uses cosine 5-nearest-neighbor affinity and ten fixed CCCP st
 It only uses the current served batch and does not change model weights.
 """
 
+import atexit
+import json
+import os
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from robust_bn import replace_batchnorm
+from robust_bn import RobustBatchNorm2d, replace_batchnorm
 
 
-def adjust_outputs(probability, features, *, neighbors=5, steps=10):
-    """Apply the paper's probability update to a symmetric local feature graph."""
-    count = len(probability)
-    if count < 2:
-        return probability
-    feature = F.normalize(features, dim=1)
+def knn_affinity(feature, neighbors):
+    """Symmetric cosine-weighted top-k graph on L2-normalized features."""
+    count = len(feature)
     similarity = feature @ feature.T
     similarity.fill_diagonal_(-1)
     values, indices = similarity.topk(min(neighbors, count - 1), dim=1)
     affinity = torch.zeros_like(similarity)
     affinity.scatter_(1, indices, values.clamp_min(0))
-    affinity = (affinity + affinity.T) * 0.5
+    return (affinity + affinity.T) * 0.5
+
+
+def matched_rbf_affinity(feature, neighbors):
+    """Dense RBF graph rescaled to the k-NN graph's mean row sum.
+
+    Distances are Euclidean on L2-normalized features, as in the LAME author
+    code. sigma is the batch mean of each sample's distance to its k-th
+    nearest other sample. The diagonal is zero. One global scale makes the
+    mean row sum equal that of `knn_affinity` on the same batch. Degenerate
+    batches (zero sigma or zero RBF mass) fall back to the k-NN graph.
+    """
+    baseline = knn_affinity(feature, neighbors)
+    count = len(feature)
+    distance = torch.cdist(feature, feature)
+    distance.fill_diagonal_(float("inf"))
+    sigma = distance.topk(min(neighbors, count - 1), dim=1,
+                          largest=False).values[:, -1].mean()
+    if not torch.isfinite(sigma) or sigma <= 1e-12:
+        return baseline
+    rbf = torch.exp(-distance.square() / (2 * sigma * sigma))  # diagonal -> 0
+    mass = rbf.sum(dim=1).mean()
+    if mass <= 1e-12:
+        return baseline
+    return rbf * (baseline.sum(dim=1).mean() / mass)
+
+
+def adjust_outputs(probability, features, *, neighbors=5, steps=10,
+                   affinity="knn", stats=None):
+    """Apply the paper's probability update to a symmetric feature graph.
+
+    `stats`, if a list, receives label-free solver diagnostics per batch:
+    max |z_10 - z_final|, argmax changes after step ten, and the last-step
+    max residual.
+    """
+    count = len(probability)
+    if count < 2:
+        return probability
+    feature = F.normalize(features, dim=1)
+    if affinity == "knn":
+        graph = knn_affinity(feature, neighbors)
+    elif affinity == "rbf":
+        graph = matched_rbf_affinity(feature, neighbors)
+    else:
+        raise ValueError(affinity)
 
     log_prior = probability.clamp_min(1e-12).log()
     assignment = probability
-    for _ in range(steps):
-        assignment = (log_prior + affinity @ assignment).softmax(dim=1)
+    at_ten = previous = None
+    for step in range(steps):
+        if stats is not None:
+            previous = assignment
+        assignment = (log_prior + graph @ assignment).softmax(dim=1)
+        if stats is not None and step == 9:
+            at_ten = assignment
+    if stats is not None and at_ten is not None:
+        stats.append(((assignment - at_ten).abs().max().item(),
+                      (assignment.argmax(1) != at_ten.argmax(1)).sum().item(),
+                      (assignment - previous).abs().max().item()))
     return assignment
 
 
@@ -67,6 +121,9 @@ class LameCurrentBatch:
     include_flip = False
     neighbors = 5
     use_memory = False
+    steps = 10
+    affinity = "knn"
+    solver_stats = None
 
     def __init__(self, model):
         self.model = model.eval()
@@ -116,7 +173,9 @@ class LameCurrentBatch:
             refined = adjust_outputs_with_memory(probability, feature, *self.memory,
                                                  neighbors=self.neighbors)
         else:
-            refined = adjust_outputs(probability, feature, neighbors=self.neighbors)
+            refined = adjust_outputs(probability, feature, neighbors=self.neighbors,
+                                     steps=self.steps, affinity=self.affinity,
+                                     stats=self.solver_stats)
         if self.use_memory:
             self.memory = (feature, refined)
         self._after_batch(feature, refined)
@@ -411,6 +470,61 @@ class LameTrimPrior(LameViewTrim):
 
 class LameTrimBoth(LameViewTrim):
     trim_prior, trim_graph = True, True
+
+
+class LameSrc02Steps100(LameK20Ema03Src02):
+    """Selected src02 method with 100 fixed graph updates instead of ten.
+
+    The LAME author code allows up to 100 updates with an energy stopping
+    rule; here all 100 run, avoiding per-step GPU syncs. If the environment
+    variable LAME_SOLVER_DIAG names a file, label-free solver diagnostics
+    (see `adjust_outputs`) are written there at exit; predictions are
+    unaffected.
+    """
+
+    steps = 100
+
+    def __init__(self, model):
+        super().__init__(model)
+        path = os.environ.get("LAME_SOLVER_DIAG")
+        if path:
+            self.solver_stats = []
+            atexit.register(self._dump_stats, path)
+
+    def _dump_stats(self, path):
+        diffs, changes, residuals = zip(*self.solver_stats)
+        summary = {"batches": len(diffs),
+                   "max_abs_diff_step10_vs_final": max(diffs),
+                   "mean_max_abs_diff_step10_vs_final": sum(diffs) / len(diffs),
+                   "argmax_changes_after_step10": sum(changes),
+                   "batches_with_changes": sum(c > 0 for c in changes),
+                   "max_last_step_residual": max(residuals),
+                   "per_batch": self.solver_stats}
+        with open(path, "w") as handle:
+            json.dump(summary, handle, indent=1)
+
+
+class LameSrc02Rbf(LameK20Ema03Src02):
+    """Selected src02 method with the matched-strength dense RBF graph."""
+
+    affinity = "rbf"
+
+
+class LameSrc02Layer4Source(LameK20Ema03Src02):
+    """Selected src02 method with checkpoint BN statistics in all of layer4.
+
+    Depth-selective ablation inspired by the label-shift sensitivity of deep
+    layers reported for Channel-Selective Normalization (CoLLAs 2024). The
+    stem and layer1-layer3 keep per-view EMA 0.3 + 20% source statistics.
+    Every BN in layer4, including the downsample BN, uses the checkpoint's
+    running statistics. The paper's source-data channel scores are not used.
+    """
+
+    def __init__(self, model):
+        super().__init__(model)
+        for name, module in self.model.named_modules():
+            if name.startswith("layer4.") and isinstance(module, RobustBatchNorm2d):
+                module.mode = "source"
 
 
 class LameEightViewMemory(LameEightView):
